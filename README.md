@@ -33,7 +33,7 @@ pip install flask
 If using Git, clone this repository:
 
 ```sh
-git clone https://github.com/your-repository-url.git
+git clone https://github.com/Zaltster/431WWeb.git
 ```
 
 Otherwise, manually download and extract the project files.
