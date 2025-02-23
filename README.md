@@ -1,5 +1,7 @@
 # Hospital Patient Management System
 
+- I made the assumtion that I could use VScode
+
 ## 📌 Project Overview
 
 This is a **Flask-based web application** that allows users to:
