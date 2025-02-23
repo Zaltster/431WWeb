@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Hospital Patient Portal</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+</head>
+<body>
+
+<div class="container text-center mt-5">
+    <!-- Page Header -->
+    <h1 class="display-4">Hospital Patient Portal</h1>
+    <p class="lead">This portal allows users to add and delete patient names from the hospital’s database.</p>
+
+    <!-- Dropdown Menu & Go Button -->
+    <div class="mt-4">
+        <form id="navigationForm">
+            <select id="actionSelect" class="form-control w-50 mx-auto">
+                <option value="">Select an action</option>
+                <option value="/name">Add Patient Name</option>
+                <option value="/delete">Delete Patient Name</option>
+            </select>
+            <button type="submit" class="btn btn-primary mt-2">Go!</button>
+        </form>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+
+<script>
+    document.getElementById("navigationForm").addEventListener("submit", function(event) {
+        event.preventDefault();
+        let selectedAction = document.getElementById("actionSelect").value;
+        if (selectedAction) {
+            window.location.href = selectedAction;
+        } else {
+            alert("Please select an action before proceeding.");
+        }
+    });
+</script>
+
+</body>
+</html>

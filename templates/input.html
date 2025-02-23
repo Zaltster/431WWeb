@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Add Patient</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+</head>
+<body>
+
+<div class="container">
+    <div class="card-body">
+        <h2 class="card-title">Enter Patient Details</h2>
+
+        <form action="/name" method="POST">
+            <div class="form-group">
+                <label for="FirstName">First Name</label>
+                <input type="text" name="FirstName" required class="form-control">
+            </div>
+            <div class="form-group">
+                <label for="LastName">Last Name</label>
+                <input type="text" name="LastName" required class="form-control">
+            </div>
+            <button type="submit" class="btn btn-primary">Add</button>
+            <a class="btn btn-success" href="/" role="button">Go Back</a>
+        </form>
+    </div>
+
+    <div class="card-body">
+        <h2 class="card-title">Patient Records</h2>
+        <table class="table table-dark">
+            <tr>
+                <th scope="col">PID</th>
+                <th scope="col">First Name</th>
+                <th scope="col">Last Name</th>
+            </tr>
+            <tbody>
+            {% for pid, first_name, last_name in result %}
+                <tr>
+                    <td>{{ pid }}</td>
+                    <td>{{ first_name }}</td>
+                    <td>{{ last_name }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+
+</body>
+</html>
