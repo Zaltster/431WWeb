@@ -3,21 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NittanyBusiness - Home</title>
+    <title>NittanyBusiness - Dashboard</title>
 </head>
 <body>
     <header>
-        <h1>Welcome to NittanyBusiness</h1>
+        <h1>NittanyBusiness - Dashboard</h1>
         <h2>CMPSC431W Project - Phase 2 Progress Review</h2>
     </header>
 
     <main>
         <section>
-            <h2>Project Overview</h2>
-            <p>This is the home page for the NittanyBusiness project. To proceed, please log in.</p>
+            <h2>Welcome, {{ user_email }}</h2>
+            <p>You are logged in as: {{ user_type }}</p>
             
             <div>
-                <a href="/login">Go to Login Page</a>
+                <h3>Account Information</h3>
+                <p>This is a placeholder dashboard page for the Phase 2 Progress Review.</p>
+                <p>User authentication has been completed successfully.</p>
+            </div>
+            
+            <div>
+                <a href="/logout">Logout</a>
             </div>
         </section>
     </main>

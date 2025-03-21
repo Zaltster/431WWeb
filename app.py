@@ -1,148 +1,175 @@
-from flask import Flask, render_template, request, flash, redirect
-import sqlite3 as sql
+from flask import Flask, render_template, request, redirect, url_for, session, flash
+from werkzeug.security import generate_password_hash, check_password_hash
+import sqlite3
+import csv
+import os
 
-# Initialize the Flask application
+# Initialize Flask application
 app = Flask(__name__)
+app.secret_key = 'nittany_business_secret_key'  # Change in production
+app.config['DATABASE'] = 'nittany.db'
 
-# Secret key is required for flash messages
-app.secret_key = 'your_secret_key_here'
+# Database connection helper
 
-# ------------------------ HOME PAGE ------------------------
+
+def get_db_connection():
+    conn = sqlite3.connect(app.config['DATABASE'])
+    conn.row_factory = sqlite3.Row
+    return conn
+
+# Initialize database schema
+
+
+def init_db():
+    with open('schema.sql', 'r') as f:
+        schema = f.read()
+
+    conn = get_db_connection()
+    conn.executescript(schema)
+    conn.close()
+    print("Database schema initialized.")
+
+# Import users from CSV with password hashing
+
+
+def import_users_from_csv(csv_file):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    # Check if Users table exists and has data
+    cursor.execute(
+        "SELECT name FROM sqlite_master WHERE type='table' AND name='Users'")
+    if cursor.fetchone() is None:
+        print("Users table does not exist. Initialize the database first.")
+        conn.close()
+        return
+
+    # Read users from CSV
+    try:
+        with open(csv_file, 'r') as file:
+            csv_reader = csv.DictReader(file)
+            for row in csv_reader:
+                # Hash the password before storing
+                password_hash = generate_password_hash(
+                    row['password'], method='sha256')
+
+                # Insert into Users table
+                cursor.execute(
+                    "INSERT OR REPLACE INTO Users (email, password) VALUES (?, ?)",
+                    (row['email'], password_hash)
+                )
+
+                # Handle different user types based on email
+                if 'helpdesk' in row['email']:
+                    cursor.execute(
+                        "INSERT OR REPLACE INTO Helpdesk (email, position) VALUES (?, ?)",
+                        (row['email'], row.get('position', 'Support Staff'))
+                    )
+                elif 'buyer' in row['email']:
+                    cursor.execute(
+                        "INSERT OR REPLACE INTO Buyer (email, business_name, buyer_address_id) VALUES (?, ?, ?)",
+                        (row['email'], row.get('business_name', 'Business'),
+                         row.get('buyer_address_id', None))
+                    )
+                elif 'seller' in row['email']:
+                    cursor.execute(
+                        "INSERT OR REPLACE INTO Sellers (email, business_name, business_address_id, bank_routing_number, bank_account_number, balance) VALUES (?, ?, ?, ?, ?, ?)",
+                        (row['email'], row.get('business_name', 'Business'), row.get('business_address_id', None),
+                         row.get('bank_routing_number', None), row.get('bank_account_number', None), row.get('balance', 0))
+                    )
+
+        conn.commit()
+        print("Users imported successfully.")
+    except Exception as e:
+        conn.rollback()
+        print(f"Error importing users: {e}")
+    finally:
+        conn.close()
+
+# Routes
+
 
 @app.route('/')
 def index():
-    """
-    Renders the main index page.
-    This page will have options to add or delete patients.
-    """
     return render_template('index.html')
 
-# ------------------------ ADD PATIENT PAGE ------------------------
 
-@app.route('/name', methods=['POST', 'GET'])
-def name():
-    """
-    Handles patient form submission and displays all stored patients.
-    - If the request is GET, it fetches and displays all patients.
-    - If the request is POST, it adds a new patient and refreshes the page.
-    """
+@app.route('/login', methods=['GET', 'POST'])
+def login():
     error = None
-    result = fetch_all_patients()  # Fetch existing patients to display
 
     if request.method == 'POST':
-        first_name = request.form['FirstName']
-        last_name = request.form['LastName']
+        email = request.form['email']
+        password = request.form['password']
 
-        if first_name and last_name:
-            insert_patient(first_name, last_name)  # Insert into DB
-            flash('Patient added successfully!', 'success')  # Show success message
-            return redirect('/name')  # Redirect to avoid form resubmission
+        # Validate user credentials
+        conn = get_db_connection()
+        user = conn.execute(
+            'SELECT * FROM Users WHERE email = ?', (email,)).fetchone()
+        conn.close()
+
+        if user is None:
+            error = "Invalid email address."
+            return render_template('login.html', error=error)
+
+        if not check_password_hash(user['password'], password):
+            error = "Invalid password."
+            return render_template('login.html', error=error)
+
+        # Login successful - store user info in session
+        session['user_email'] = user['email']
+
+        # Determine user type based on email (simplified approach)
+        if 'helpdesk' in email:
+            session['user_type'] = 'helpdesk'
+            return redirect(url_for('helpdesk_dashboard'))
+        elif 'buyer' in email:
+            session['user_type'] = 'buyer'
+            return redirect(url_for('buyer_dashboard'))
+        elif 'seller' in email:
+            session['user_type'] = 'seller'
+            return redirect(url_for('seller_dashboard'))
         else:
-            error = 'Invalid input name'
+            session['user_type'] = 'user'
+            return redirect(url_for('dashboard'))
 
-    return render_template('input.html', error=error, result=result)
+    # GET request - show login page
+    return render_template('login.html', error=error)
 
-# ------------------------ DELETE PATIENT PAGE ------------------------
 
-@app.route('/delete', methods=['POST', 'GET'])
-def delete():
-    """
-    Handles patient deletion and displays the updated patient list.
-    - If the request is GET, it shows all patients.
-    - If the request is POST, it deletes a patient and refreshes the page.
-    """
-    result = fetch_all_patients()  # Fetch patients to display
+@app.route('/dashboard')
+def dashboard():
+    if 'user_email' not in session:
+        return redirect(url_for('login'))
+    return render_template('dashboard.html', user_email=session['user_email'], user_type=session['user_type'])
 
-    if request.method == 'POST':
-        first_name = request.form['FirstName']
-        last_name = request.form['LastName']
-        
-        if first_name and last_name:
-            success = delete_patient(first_name, last_name)  # Delete patient
-            if success:
-                flash(f'Patient {first_name} {last_name} deleted successfully!', 'success')
-            else:
-                flash(f'Patient {first_name} {last_name} not found.', 'danger')
 
-            return redirect('/delete')  # Redirect to avoid form resubmission
+@app.route('/helpdesk_dashboard')
+def helpdesk_dashboard():
+    if 'user_email' not in session or session['user_type'] != 'helpdesk':
+        return redirect(url_for('login'))
+    return render_template('dashboard.html', user_email=session['user_email'], user_type='helpdesk')
 
-    return render_template('delete.html', result=result)
 
-# ------------------------ DATABASE OPERATIONS ------------------------
+@app.route('/buyer_dashboard')
+def buyer_dashboard():
+    if 'user_email' not in session or session['user_type'] != 'buyer':
+        return redirect(url_for('login'))
+    return render_template('dashboard.html', user_email=session['user_email'], user_type='buyer')
 
-def insert_patient(first_name, last_name):
-    """
-    Inserts a new patient with a unique PID into the database.
-    - `pid` is auto-incremented for each new entry.
-    - First and last names are capitalized for consistency.
-    """
-    first_name = first_name.capitalize()
-    last_name = last_name.capitalize()
 
-    connection = sql.connect('database.db')  # Connect to the database
-    cursor = connection.cursor()
-    
-    # Ensure the table exists before inserting
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS patients (
-            pid INTEGER PRIMARY KEY AUTOINCREMENT, 
-            firstname TEXT, 
-            lastname TEXT
-        );
-    ''')
+@app.route('/seller_dashboard')
+def seller_dashboard():
+    if 'user_email' not in session or session['user_type'] != 'seller':
+        return redirect(url_for('login'))
+    return render_template('dashboard.html', user_email=session['user_email'], user_type='seller')
 
-    # Insert the new patient
-    cursor.execute('INSERT INTO patients (firstname, lastname) VALUES (?, ?);', (first_name, last_name))
-    
-    connection.commit()  # Save changes
-    connection.close()  # Close the database connection
 
-def fetch_all_patients():
-    """
-    Retrieves all stored patients from the database.
-    Returns a list of tuples (pid, first_name, last_name).
-    """
-    connection = sql.connect('database.db')  # Connect to the database
-    cursor = connection.cursor()
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect(url_for('index'))
 
-    # Ensure table exists before fetching data
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS patients (
-            pid INTEGER PRIMARY KEY AUTOINCREMENT, 
-            firstname TEXT, 
-            lastname TEXT
-        );
-    ''')
 
-    cursor.execute('SELECT * FROM patients;')  # Retrieve all patient records
-    result = cursor.fetchall()
-
-    connection.close()  # Close the database connection
-    return result
-
-def delete_patient(first_name, last_name):
-    """
-    Deletes a patient from the database if they exist.
-    Returns True if deleted successfully, False if the patient was not found.
-    """
-    connection = sql.connect('database.db')  # Connect to the database
-    cursor = connection.cursor()
-
-    # Check if the patient exists
-    cursor.execute('SELECT * FROM patients WHERE firstname = ? AND lastname = ?', (first_name, last_name))
-    patient = cursor.fetchone()
-
-    if patient:
-        # Delete the patient if found
-        cursor.execute('DELETE FROM patients WHERE firstname = ? AND lastname = ?', (first_name, last_name))
-        connection.commit()  # Save changes
-        connection.close()
-        return True
-
-    connection.close()
-    return False  # Return False if patient not found
-
-# ------------------------ RUN FLASK APP ------------------------
-
-if __name__ == "__main__":
-    app.run()
+if __name__ == '__main__':
+    app.run(debug=True)
