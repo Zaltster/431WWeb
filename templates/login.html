@@ -4,6 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NittanyBusiness - Login</title>
+    <style>
+        .error-message {
+            color: red;
+            font-weight: bold;
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #ffebee;
+            border: 1px solid #ffcdd2;
+            border-radius: 4px;
+        }
+    </style>
 </head>
 <body>
     <header>
@@ -15,6 +26,12 @@
         <section>
             <h2>User Login</h2>
             <p>Please enter your email address and password to log in.</p>
+            
+            {% if error %}
+            <div class="error-message">
+                {{ error }}
+            </div>
+            {% endif %}
             
             <form action="/login" method="post">
                 <div>
