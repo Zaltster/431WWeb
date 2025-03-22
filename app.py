@@ -1,8 +1,8 @@
-from flask import Flask, render_template, request, redirect, url_for, session, flash
-from werkzeug.security import generate_password_hash, check_password_hash
+from flask import Flask, render_template, request, redirect, url_for, session
+from werkzeug.security import generate_password_hash
 import sqlite3
 import csv
-import os
+
 
 # Initialize Flask application
 app = Flask(__name__)
