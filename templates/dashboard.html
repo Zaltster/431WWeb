@@ -9,21 +9,43 @@
     <header>
         <h1>NittanyBusiness - Dashboard</h1>
         <h2>CMPSC431W Project - Phase 2 Progress Review</h2>
+        <div>
+            <a href="/logout">Logout</a>
+        </div>
     </header>
 
     <main>
         <section>
-            <h2>Welcome, {{ user_email }}</h2>
-            <p>You are logged in as: {{ user_type }}</p>
+            <h2>Welcome to Your Dashboard</h2>
+            <p>You are logged in as: <strong>{{ user_email }}</strong></p>
+            <p>User Type: <strong>{{ user_type }}</strong></p>
             
-            <div>
-                <h3>Account Information</h3>
-                <p>This is a placeholder dashboard page for the Phase 2 Progress Review.</p>
-                <p>User authentication has been completed successfully.</p>
-            </div>
-            
-            <div>
-                <a href="/logout">Logout</a>
+            <div class="dashboard-content">
+                <h3>Authentication Successful</h3>
+                <p>This confirms that your login credentials were correctly verified against the database.</p>
+                <p>The password you entered was successfully validated against the securely hashed password stored in the database.</p>
+                
+                {% if user_type == 'helpdesk' %}
+                    <div class="user-specific-content">
+                        <h3>Helpdesk Staff Portal</h3>
+                        <p>Access tools to manage customer requests and provide support.</p>
+                    </div>
+                {% elif user_type == 'buyer' %}
+                    <div class="user-specific-content">
+                        <h3>Buyer Portal</h3>
+                        <p>Browse products, manage orders, and update your profile.</p>
+                    </div>
+                {% elif user_type == 'seller' %}
+                    <div class="user-specific-content">
+                        <h3>Seller Portal</h3>
+                        <p>Manage your product listings, view sales, and update your store information.</p>
+                    </div>
+                {% else %}
+                    <div class="user-specific-content">
+                        <h3>User Portal</h3>
+                        <p>Access your account settings and preferences.</p>
+                    </div>
+                {% endif %}
             </div>
         </section>
     </main>
