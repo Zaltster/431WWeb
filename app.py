@@ -9,7 +9,7 @@ app = Flask(__name__)
 app.secret_key = 'nittany_business_secret_key'  # Change in production
 app.config['DATABASE'] = 'database.db'
 
-# Database connection helper
+# Helper Function - Connect to Database
 
 
 def get_db_connection():
@@ -17,7 +17,7 @@ def get_db_connection():
     conn.row_factory = sqlite3.Row
     return conn
 
-# Initialize database schema
+# Start Database
 
 
 def init_db():
@@ -29,14 +29,14 @@ def init_db():
     conn.close()
     print("Database schema initialized.")
 
-# Import users from CSV with password hashing
+# Import Users from the given CSV file - uses SHA-256 hasing to encrpyt passwords
 
 
 def import_users_from_csv(csv_file):
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    # Check if Users table exists and has data
+    # Check if User table exist
     cursor.execute(
         "SELECT name FROM sqlite_master WHERE type='table' AND name='Users'")
     if cursor.fetchone() is None:
@@ -53,13 +53,13 @@ def import_users_from_csv(csv_file):
                 password_hash = generate_password_hash(
                     row['password'], method='sha256')
 
-                # Insert into Users table
+                # Add a user into Table
                 cursor.execute(
                     "INSERT OR REPLACE INTO Users (email, password) VALUES (?, ?)",
                     (row['email'], password_hash)
                 )
 
-                # Handle different user types based on email
+                # Insert into repsective sub class Table based on user type
                 if 'helpdesk' in row['email']:
                     cursor.execute(
                         "INSERT OR REPLACE INTO Helpdesk (email, position) VALUES (?, ?)",
@@ -88,10 +88,14 @@ def import_users_from_csv(csv_file):
 
 # Routes
 
+# Index/Home Routing
+
 
 @app.route('/')
 def index():
     return render_template('index.html')
+
+# Login routing
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -164,12 +168,16 @@ def login():
     # GET request - show login page
     return render_template('login.html', error=error)
 
+# Dashboard routing
+
 
 @app.route('/dashboard')
 def dashboard():
     if 'user_email' not in session:
         return redirect(url_for('login'))
     return render_template('dashboard.html', user_email=session['user_email'], user_type=session['user_type'])
+
+# Dashboard routing for helpdesk
 
 
 @app.route('/helpdesk_dashboard')
@@ -178,6 +186,8 @@ def helpdesk_dashboard():
         return redirect(url_for('login'))
     return render_template('dashboard.html', user_email=session['user_email'], user_type='helpdesk')
 
+# Dashboard routing for buyer
+
 
 @app.route('/buyer_dashboard')
 def buyer_dashboard():
@@ -185,12 +195,16 @@ def buyer_dashboard():
         return redirect(url_for('login'))
     return render_template('dashboard.html', user_email=session['user_email'], user_type='buyer')
 
+# Dashboard routing for seller
+
 
 @app.route('/seller_dashboard')
 def seller_dashboard():
     if 'user_email' not in session or session['user_type'] != 'seller':
         return redirect(url_for('login'))
     return render_template('dashboard.html', user_email=session['user_email'], user_type='seller')
+
+# Logout routing
 
 
 @app.route('/logout')
