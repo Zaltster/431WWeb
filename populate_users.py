@@ -2,19 +2,20 @@ import sqlite3
 import csv
 
 
-def populate_address_table():
+def populate_requests_table():
     # Connect to the database
     conn = sqlite3.connect('database.db')
     cursor = conn.cursor()
 
-    print("Creating Address table if it doesn't exist...")
+    print("Creating Requests table if it doesn't exist...")
     cursor.execute('''
-    CREATE TABLE IF NOT EXISTS Address (
-        address_ID TEXT PRIMARY KEY,
-        zipcode TEXT NOT NULL,
-        street_num INTEGER NOT NULL,
-        street_name TEXT NOT NULL,
-        FOREIGN KEY (zipcode) REFERENCES Zipcode_Info(zipcode)
+    CREATE TABLE IF NOT EXISTS Requests (
+        request_id INTEGER PRIMARY KEY,
+        sender_email TEXT NOT NULL,
+        helpdesk_staff_email TEXT NOT NULL,
+        request_type TEXT NOT NULL,
+        request_desc TEXT,
+        request_status INTEGER
     )
     ''')
     conn.commit()
@@ -25,41 +26,44 @@ def populate_address_table():
 
     try:
         # Open and read the CSV file
-        print("Opening Address.csv file...")
-        with open('Address.csv', 'r', encoding='utf-8-sig') as file:
+        print("Opening Requests.csv file...")
+        with open('Requests.csv', 'r', encoding='utf-8-sig') as file:
             reader = csv.reader(file)
             next(reader)  # Skip header row
 
             insert_count = 0
-            print("Processing addresses...")
+            print("Processing requests...")
             for row in reader:
-                if len(row) >= 4:  # Ensure we have all required columns
-                    address_id = row[0].strip()
-                    zipcode = row[1].strip()
-                    street_num = row[2].strip()
-                    street_name = row[3].strip()
+                if len(row) >= 6:  # Ensure we have all required columns
+                    request_id = row[0].strip()
+                    sender_email = row[1].strip()
+                    helpdesk_staff_email = row[2].strip()
+                    request_type = row[3].strip()
+                    request_desc = row[4].strip()
+                    request_status = row[5].strip()
 
-                    if address_id and zipcode and street_name:
+                    if request_id and sender_email and helpdesk_staff_email:
                         try:
                             cursor.execute(
-                                "INSERT OR REPLACE INTO Address (address_ID, zipcode, street_num, street_name) VALUES (?, ?, ?, ?)",
-                                (address_id, zipcode, int(street_num), street_name)
+                                "INSERT OR REPLACE INTO Requests (request_id, sender_email, helpdesk_staff_email, request_type, request_desc, request_status) VALUES (?, ?, ?, ?, ?, ?)",
+                                (int(request_id), sender_email, helpdesk_staff_email,
+                                 request_type, request_desc, int(request_status))
                             )
                             insert_count += 1
                         except Exception as e:
-                            print(f"Error with address {address_id}: {str(e)}")
+                            print(f"Error with request {request_id}: {str(e)}")
 
             conn.commit()
-            print(f"Successfully added {insert_count} addresses.")
+            print(f"Successfully added {insert_count} requests.")
 
-            # Show sample of imported addresses
+            # Show sample of imported requests
             cursor.execute(
-                "SELECT address_ID, zipcode, street_num, street_name FROM Address LIMIT 5")
-            addresses = cursor.fetchall()
-            print("\nSample of imported addresses:")
-            for address in addresses:
+                "SELECT request_id, sender_email, request_type, request_status FROM Requests LIMIT 5")
+            requests = cursor.fetchall()
+            print("\nSample of imported requests:")
+            for request in requests:
                 print(
-                    f"ID: {address[0]}, Zipcode: {address[1]}, Street: {address[2]} {address[3]}")
+                    f"ID: {request[0]}, Sender: {request[1]}, Type: {request[2]}, Status: {request[3]}")
 
     except Exception as e:
         print(f"Error: {str(e)}")
@@ -73,6 +77,6 @@ def populate_address_table():
 
 
 if __name__ == "__main__":
-    print("Starting address import process...")
-    populate_address_table()
+    print("Starting requests import process...")
+    populate_requests_table()
     print("Process completed.")
