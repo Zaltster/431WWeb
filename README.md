@@ -84,9 +84,8 @@ Several scripts are provided to populate the database from CSV files:
 
 2. Import other data as needed:
    ```bash
-   python import_helpdesk.py
-   python import_sellers.py
-   python import_buyers.py
+   python populate_address.py
+   python populate_requests.py
    # Additional import scripts...
    ```
 
