@@ -273,26 +273,36 @@
                     <p>Join NittanyBusiness and start your e-commerce journey</p>
                 </div>
                 <div class="form-body">
-                    <form id="signup-form" action="/register" method="post">
+                    <!-- Error Message (displayed conditionally) -->
+                    {% if error %}
+                    <div class="error-message">
+                        <i class="fas fa-exclamation-circle"></i> {{ error }}
+                    </div>
+                    {% endif %}
+
+                    <form id="signup-form" action="/signup" method="post">
                         <!-- User Type Selection -->
                         <h3>Select Account Type</h3>
                         <div class="user-type-selection">
                             <div class="user-type-option">
-                                <input type="radio" id="buyer" name="user_type" value="buyer" checked>
+                                <input type="radio" id="buyer" name="user_type" value="buyer" {% if
+                                    selected_type=='buyer' %}checked{% endif %}>
                                 <label for="buyer">
                                     <i class="fas fa-shopping-cart"></i>
                                     Buyer
                                 </label>
                             </div>
                             <div class="user-type-option">
-                                <input type="radio" id="seller" name="user_type" value="seller">
+                                <input type="radio" id="seller" name="user_type" value="seller" {% if
+                                    selected_type=='seller' %}checked{% endif %}>
                                 <label for="seller">
                                     <i class="fas fa-store"></i>
                                     Seller
                                 </label>
                             </div>
                             <div class="user-type-option">
-                                <input type="radio" id="helpdesk" name="user_type" value="helpdesk">
+                                <input type="radio" id="helpdesk" name="user_type" value="helpdesk" {% if
+                                    selected_type=='helpdesk' %}checked{% endif %}>
                                 <label for="helpdesk">
                                     <i class="fas fa-headset"></i>
                                     Helpdesk

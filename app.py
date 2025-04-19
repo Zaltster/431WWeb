@@ -27,7 +27,7 @@ def init_db():
     conn.close()
     print("Database schema initialized.")
 
-# Import Users from the given CSV file - uses SHA-256 hasing to encrpyt passwords
+# Import Users from the given CSV file - uses SHA-256 hashing to encrypt passwords
 def import_users_from_csv(csv_file):
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -46,8 +46,7 @@ def import_users_from_csv(csv_file):
             csv_reader = csv.DictReader(file)
             for row in csv_reader:
                 # Hash the password before storing
-                password_hash = generate_password_hash(
-                    row['password'], method='sha256')
+                password_hash = hashlib.sha256(row['password'].encode('utf-8')).hexdigest()
 
                 # Add a user into Table
                 cursor.execute(
@@ -55,7 +54,7 @@ def import_users_from_csv(csv_file):
                     (row['email'], password_hash)
                 )
 
-                # Insert into repsective sub class Table based on user type
+                # Insert into respective sub class Table based on user type
                 if 'helpdesk' in row['email']:
                     cursor.execute(
                         "INSERT OR REPLACE INTO Helpdesk (email, position) VALUES (?, ?)",
@@ -167,140 +166,172 @@ def login():
 # Signup Routing
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
+    print("Signup route accessed")  # Debug print
+    
     if request.method == 'POST':
-        # Extract form data
-        email = request.form['email']
-        password = request.form['password']
-        user_type = request.form['user_type']
-        
-        # Check if email already exists
-        conn = get_db_connection()
-        existing_user = conn.execute('SELECT * FROM Users WHERE email = ?', (email,)).fetchone()
-        
-        if existing_user:
-            conn.close()
-            error = "Email already registered. Please use a different email or login."
-            return render_template('signup.html', error=error)
-        
-        # Hash the password using SHA-256 (for consistency with existing code)
-        password_hash = hashlib.sha256(password.encode('utf-8')).hexdigest()
-        
-        # Insert the new user
-        cursor = conn.cursor()
-        cursor.execute('INSERT INTO Users (email, password) VALUES (?, ?)', (email, password_hash))
-        
-        # Handle user-specific data based on type
-        if user_type == 'buyer':
-            business_name = request.form.get('business_name', '')
+        try:
+            print("Processing signup POST request")  # Debug print
+            print(f"Form data: {request.form}")  # Debug print
             
-            # Handle address creation first
-            street_num = request.form.get('street_num', '')
-            street_name = request.form.get('street_name', '')
-            zipcode = request.form.get('zipcode', '')
+            # Extract form data
+            email = request.form['email']
+            password = request.form['password']
+            user_type = request.form['user_type']
             
-            # Check if zipcode exists, if not add it
-            if zipcode:
-                zip_exists = conn.execute('SELECT * FROM Zipcode_Info WHERE zipcode = ?', (zipcode,)).fetchone()
-                if not zip_exists:
-                    city = request.form.get('city', '')
-                    state = request.form.get('state', '')
-                    cursor.execute('INSERT INTO Zipcode_Info (zipcode, city, state) VALUES (?, ?, ?)', 
-                                (zipcode, city, state))
+            print(f"Signup attempt - Email: {email}, Type: {user_type}")  # Debug print
             
-            # Create address record
-            address_id = None
-            if street_num and street_name and zipcode:
-                cursor.execute('''
-                    INSERT INTO Address (zipcode, street_num, street_name) 
-                    VALUES (?, ?, ?)
-                ''', (zipcode, street_num, street_name))
-                address_id = cursor.lastrowid
+            # Check if email already exists
+            conn = get_db_connection()
+            existing_user = conn.execute('SELECT * FROM Users WHERE email = ?', (email,)).fetchone()
             
-            # Create buyer record
-            cursor.execute('''
-                INSERT INTO Buyer (email, business_name, buyer_address_id) 
-                VALUES (?, ?, ?)
-            ''', (email, business_name, address_id))
+            if existing_user:
+                print(f"Email {email} already exists in database")  # Debug print
+                conn.close()
+                error = "Email already registered. Please use a different email or login."
+                return render_template('signup.html', error=error)
             
-            # Handle credit card info if provided
-            card_num = request.form.get('credit_card_num', '')
-            if card_num:
-                card_type = request.form.get('card_type', '')
-                expire_month = request.form.get('expire_month', '')
-                expire_year = request.form.get('expire_year', '')
-                security_code = request.form.get('security_code', '')
+            # Hash the password using SHA-256 (for consistency with existing code)
+            password_hash = hashlib.sha256(password.encode('utf-8')).hexdigest()
+            print(f"Password hashed: {password_hash[:20]}...")  # Debug print - only show part of hash
+            
+            # Insert the new user
+            cursor = conn.cursor()
+            cursor.execute('INSERT INTO Users (email, password) VALUES (?, ?)', (email, password_hash))
+            print(f"User added to Users table: {email}")  # Debug print
+            
+            # Handle user-specific data based on type
+            if user_type == 'buyer':
+                business_name = request.form.get('business_name', '')
                 
+                # Handle address creation first
+                street_num = request.form.get('street_num', '')
+                street_name = request.form.get('street_name', '')
+                zipcode = request.form.get('zipcode', '')
+                
+                # Check if zipcode exists, if not add it
+                address_id = None
+                if zipcode:
+                    zip_exists = conn.execute('SELECT * FROM Zipcode_Info WHERE zipcode = ?', (zipcode,)).fetchone()
+                    if not zip_exists:
+                        city = request.form.get('city', '')
+                        state = request.form.get('state', '')
+                        print(f"Adding new zipcode: {zipcode}, {city}, {state}")  # Debug print
+                        cursor.execute('INSERT INTO Zipcode_Info (zipcode, city, state) VALUES (?, ?, ?)', 
+                                    (zipcode, city, state))
+                
+                # Create address record
+                if street_num and street_name and zipcode:
+                    print(f"Creating address record: {street_num} {street_name}, {zipcode}")  # Debug print
+                    cursor.execute('''
+                        INSERT INTO Address (zipcode, street_num, street_name) 
+                        VALUES (?, ?, ?)
+                    ''', (zipcode, street_num, street_name))
+                    address_id = cursor.lastrowid
+                    print(f"Created address with ID: {address_id}")  # Debug print
+                
+                # Create buyer record
+                print(f"Creating buyer record: {email}, {business_name}, {address_id}")  # Debug print
                 cursor.execute('''
-                    INSERT INTO Credit_Cards (credit_card_num, card_type, expire_month, 
-                    expire_year, security_code, Owner_email) 
-                    VALUES (?, ?, ?, ?, ?, ?)
-                ''', (card_num, card_type, expire_month, expire_year, security_code, email))
-            
-        elif user_type == 'seller':
-            business_name = request.form.get('seller_business_name', '')
-            
-            # Handle address creation first
-            street_num = request.form.get('seller_street_num', '')
-            street_name = request.form.get('seller_street_name', '')
-            zipcode = request.form.get('seller_zipcode', '')
-            
-            # Check if zipcode exists, if not add it
-            if zipcode:
-                zip_exists = conn.execute('SELECT * FROM Zipcode_Info WHERE zipcode = ?', (zipcode,)).fetchone()
-                if not zip_exists:
-                    city = request.form.get('seller_city', '')
-                    state = request.form.get('seller_state', '')
-                    cursor.execute('INSERT INTO Zipcode_Info (zipcode, city, state) VALUES (?, ?, ?)', 
-                                (zipcode, city, state))
-            
-            # Create address record
-            address_id = None
-            if street_num and street_name and zipcode:
-                cursor.execute('''
-                    INSERT INTO Address (zipcode, street_num, street_name) 
+                    INSERT INTO Buyer (email, business_name, buyer_address_id) 
                     VALUES (?, ?, ?)
-                ''', (zipcode, street_num, street_name))
-                address_id = cursor.lastrowid
+                ''', (email, business_name, address_id))
+                
+                # Handle credit card info if provided
+                card_num = request.form.get('credit_card_num', '')
+                if card_num:
+                    card_type = request.form.get('card_type', '')
+                    expire_month = request.form.get('expire_month', '')
+                    expire_year = request.form.get('expire_year', '')
+                    security_code = request.form.get('security_code', '')
+                    
+                    print(f"Adding credit card for {email}")  # Debug print
+                    cursor.execute('''
+                        INSERT INTO Credit_Cards (credit_card_num, card_type, expire_month, 
+                        expire_year, security_code, Owner_email) 
+                        VALUES (?, ?, ?, ?, ?, ?)
+                    ''', (card_num, card_type, expire_month, expire_year, security_code, email))
+                
+            elif user_type == 'seller':
+                business_name = request.form.get('seller_business_name', '')
+                
+                # Handle address creation first
+                street_num = request.form.get('seller_street_num', '')
+                street_name = request.form.get('seller_street_name', '')
+                zipcode = request.form.get('seller_zipcode', '')
+                
+                # Check if zipcode exists, if not add it
+                address_id = None
+                if zipcode:
+                    zip_exists = conn.execute('SELECT * FROM Zipcode_Info WHERE zipcode = ?', (zipcode,)).fetchone()
+                    if not zip_exists:
+                        city = request.form.get('seller_city', '')
+                        state = request.form.get('seller_state', '')
+                        print(f"Adding new zipcode: {zipcode}, {city}, {state}")  # Debug print
+                        cursor.execute('INSERT INTO Zipcode_Info (zipcode, city, state) VALUES (?, ?, ?)', 
+                                    (zipcode, city, state))
+                
+                # Create address record
+                if street_num and street_name and zipcode:
+                    print(f"Creating address record: {street_num} {street_name}, {zipcode}")  # Debug print
+                    cursor.execute('''
+                        INSERT INTO Address (zipcode, street_num, street_name) 
+                        VALUES (?, ?, ?)
+                    ''', (zipcode, street_num, street_name))
+                    address_id = cursor.lastrowid
+                    print(f"Created address with ID: {address_id}")  # Debug print
+                
+                # Get banking info
+                bank_routing_number = request.form.get('bank_routing_number', '')
+                bank_account_number = request.form.get('bank_account_number', '')
+                
+                # Create seller record with initial balance of 0
+                print(f"Creating seller record: {email}, {business_name}, {address_id}")  # Debug print
+                cursor.execute('''
+                    INSERT INTO Sellers (email, business_name, business_address_id, 
+                    bank_routing_number, bank_account_number, balance) 
+                    VALUES (?, ?, ?, ?, ?, 0)
+                ''', (email, business_name, address_id, bank_routing_number, bank_account_number))
+                
+            elif user_type == 'helpdesk':
+                position = request.form.get('position', 'Support Staff')
+                
+                # Create helpdesk record
+                print(f"Creating helpdesk record: {email}, {position}")  # Debug print
+                cursor.execute('INSERT INTO Helpdesk (email, position) VALUES (?, ?)', 
+                             (email, position))
             
-            # Get banking info
-            bank_routing_number = request.form.get('bank_routing_number', '')
-            bank_account_number = request.form.get('bank_account_number', '')
+            # Commit the transaction
+            conn.commit()
+            print(f"Successfully created account for {email} as {user_type}")  # Debug print
+            conn.close()
             
-            # Create seller record with initial balance of 0
-            cursor.execute('''
-                INSERT INTO Sellers (email, business_name, business_address_id, 
-                bank_routing_number, bank_account_number, balance) 
-                VALUES (?, ?, ?, ?, ?, 0)
-            ''', (email, business_name, address_id, bank_routing_number, bank_account_number))
+            # Set session data
+            session['user_email'] = email
+            session['user_type'] = user_type
             
-        elif user_type == 'helpdesk':
-            position = request.form.get('position', 'Support Staff')
+            print(f"Setting session for {email} as {user_type}")  # Debug print
             
-            # Create helpdesk record
-            cursor.execute('INSERT INTO Helpdesk (email, position) VALUES (?, ?)', 
-                          (email, position))
-        
-        # Commit the transaction
-        conn.commit()
-        conn.close()
-        
-        # Set session data
-        session['user_email'] = email
-        session['user_type'] = user_type
-        
-        # Redirect to appropriate dashboard
-        if user_type == 'buyer':
-            return redirect(url_for('buyer_dashboard'))
-        elif user_type == 'seller':
-            return redirect(url_for('seller_dashboard'))
-        elif user_type == 'helpdesk':
-            return redirect(url_for('helpdesk_dashboard'))
-        else:
-            return redirect(url_for('dashboard'))
+            # Redirect to appropriate dashboard
+            if user_type == 'buyer':
+                return redirect(url_for('buyer_dashboard'))
+            elif user_type == 'seller':
+                return redirect(url_for('seller_dashboard'))
+            elif user_type == 'helpdesk':
+                return redirect(url_for('helpdesk_dashboard'))
+            else:
+                return redirect(url_for('dashboard'))
+                
+        except Exception as e:
+            print(f"Error during signup: {str(e)}")  # Debug print
+            conn.rollback()
+            conn.close()
+            error = f"An error occurred during signup: {str(e)}"
+            return render_template('signup.html', error=error)
     
     # For GET request, show the signup form
     # If a user type was specified in the query string, pre-select that option
     user_type = request.args.get('type', 'buyer')
+    print(f"Showing signup form with preselected type: {user_type}")  # Debug print
     return render_template('signup.html', selected_type=user_type)
 
 # Forgot Password Route
