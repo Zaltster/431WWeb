@@ -1,30 +1,515 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NittanyBusiness - Home</title>
+    <title>NittanyBusiness - E-commerce Platform</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #1e88e5;
+            --secondary-color: #0d47a1;
+            --accent-color: #64b5f6;
+            --text-color: #333;
+            --light-bg: #f5f5f5;
+            --card-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            --hover-transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--light-bg);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header Styles */
+        header {
+            background-color: white;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .logo span {
+            color: var(--secondary-color);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+        }
+
+        .nav-links a {
+            color: var(--text-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--hover-transition);
+        }
+
+        .nav-links a:hover {
+            color: var(--primary-color);
+        }
+
+        .auth-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--hover-transition);
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-outline {
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+            background: transparent;
+        }
+
+        .btn-outline:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 80px 0;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+
+        .hero p {
+            font-size: 20px;
+            max-width: 700px;
+            margin: 0 auto 30px;
+        }
+
+        /* Features Section */
+        .features {
+            padding: 80px 0;
+            background-color: white;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 50px;
+            font-size: 36px;
+            color: var(--secondary-color);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .feature-card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: var(--card-shadow);
+            text-align: center;
+            transition: var(--hover-transition);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+        }
+
+        .feature-icon {
+            font-size: 48px;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+
+        .feature-card h3 {
+            margin-bottom: 15px;
+            font-size: 22px;
+        }
+
+        /* User Types Section */
+        .user-types {
+            padding: 80px 0;
+            background-color: var(--light-bg);
+        }
+
+        .user-types-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .user-type-card {
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+            transition: var(--hover-transition);
+        }
+
+        .user-type-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+        }
+
+        .card-header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .card-header h3 {
+            font-size: 24px;
+        }
+
+        .card-body {
+            padding: 30px;
+        }
+
+        .card-body ul {
+            list-style-type: none;
+            margin-bottom: 30px;
+        }
+
+        .card-body ul li {
+            margin-bottom: 10px;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .card-body ul li i {
+            color: var(--primary-color);
+            margin-right: 10px;
+            margin-top: 5px;
+        }
+
+        .card-body .btn {
+            width: 100%;
+            text-align: center;
+        }
+
+        /* CTA Section */
+        .cta {
+            padding: 80px 0;
+            text-align: center;
+            background-color: white;
+        }
+
+        .cta h2 {
+            font-size: 36px;
+            margin-bottom: 20px;
+            color: var(--secondary-color);
+        }
+
+        .cta p {
+            font-size: 18px;
+            max-width: 700px;
+            margin: 0 auto 30px;
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 50px 0 20px;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-column h3 {
+            font-size: 20px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .footer-column h3::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: -8px;
+            width: 40px;
+            height: 3px;
+            background-color: var(--accent-color);
+        }
+
+        .footer-column ul {
+            list-style-type: none;
+        }
+
+        .footer-column ul li {
+            margin-bottom: 10px;
+        }
+
+        .footer-column ul li a {
+            color: #b3e5fc;
+            text-decoration: none;
+            transition: var(--hover-transition);
+        }
+
+        .footer-column ul li a:hover {
+            color: white;
+        }
+
+        .copyright {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 14px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .nav-links {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+
+            .hero h1 {
+                font-size: 36px;
+            }
+
+            .hero p {
+                font-size: 18px;
+            }
+
+            .section-title {
+                font-size: 30px;
+            }
+        }
+    </style>
 </head>
+
 <body>
+    <!-- Header -->
     <header>
-        <h1>Welcome to NittanyBusiness</h1>
-        <h2>CMPSC431W Project - Phase 2 Progress Review</h2>
+        <div class="container">
+            <nav class="navbar">
+                <a href="/" class="logo">Nittany<span>Business</span></a>
+                <div class="nav-links">
+                    <a href="#">Products</a>
+                    <a href="#">Categories</a>
+                    <a href="#">About</a>
+                    <a href="#">Contact</a>
+                </div>
+                <div class="auth-buttons">
+                    <a href="/login" class="btn btn-outline">Login</a>
+                    <a href="/signup" class="btn btn-primary">Sign Up</a>
+                </div>
+            </nav>
+        </div>
     </header>
 
-    <main>
-        <section>
-            <h2>Project Overview</h2>
-            <p>This is the home page for the NittanyBusiness project. To proceed, please log in.</p>
-            
-            <div>
-                <a href="/login">Go to Login Page</a>
-            </div>
-        </section>
-    </main>
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <h1>Welcome to NittanyBusiness</h1>
+            <p>Your complete e-commerce solution connecting buyers and sellers with seamless transactions</p>
+            <a href="/signup" class="btn btn-primary">Get Started</a>
+        </div>
+    </section>
 
+    <!-- Features Section -->
+    <section class="features">
+        <div class="container">
+            <h2 class="section-title">Our Platform Features</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-shopping-cart"></i>
+                    </div>
+                    <h3>Easy Shopping</h3>
+                    <p>Browse through thousands of products with our intuitive interface and advanced filtering options.
+                    </p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-store"></i>
+                    </div>
+                    <h3>Seller Dashboard</h3>
+                    <p>Powerful tools to list products, track inventory, and manage orders efficiently.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-headset"></i>
+                    </div>
+                    <h3>24/7 Support</h3>
+                    <p>Our dedicated helpdesk team is always available to assist with any issues or questions.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- User Types Section -->
+    <section class="user-types">
+        <div class="container">
+            <h2 class="section-title">Choose Your Role</h2>
+            <div class="user-types-grid">
+                <div class="user-type-card">
+                    <div class="card-header">
+                        <h3>Buyer</h3>
+                    </div>
+                    <div class="card-body">
+                        <ul>
+                            <li><i class="fas fa-check"></i> Browse and purchase products</li>
+                            <li><i class="fas fa-check"></i> Track order history</li>
+                            <li><i class="fas fa-check"></i> Manage payment methods</li>
+                            <li><i class="fas fa-check"></i> Leave product reviews</li>
+                        </ul>
+                        <a href="/signup?type=buyer" class="btn btn-primary">Join as Buyer</a>
+                    </div>
+                </div>
+                <div class="user-type-card">
+                    <div class="card-header">
+                        <h3>Seller</h3>
+                    </div>
+                    <div class="card-body">
+                        <ul>
+                            <li><i class="fas fa-check"></i> List and manage products</li>
+                            <li><i class="fas fa-check"></i> Process customer orders</li>
+                            <li><i class="fas fa-check"></i> Track sales performance</li>
+                            <li><i class="fas fa-check"></i> Receive secure payments</li>
+                        </ul>
+                        <a href="/signup?type=seller" class="btn btn-primary">Join as Seller</a>
+                    </div>
+                </div>
+                <div class="user-type-card">
+                    <div class="card-header">
+                        <h3>Helpdesk</h3>
+                    </div>
+                    <div class="card-body">
+                        <ul>
+                            <li><i class="fas fa-check"></i> Manage customer requests</li>
+                            <li><i class="fas fa-check"></i> Provide platform support</li>
+                            <li><i class="fas fa-check"></i> Resolve user issues</li>
+                            <li><i class="fas fa-check"></i> Access admin tools</li>
+                        </ul>
+                        <a href="/signup?type=helpdesk" class="btn btn-primary">Join as Helpdesk</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta">
+        <div class="container">
+            <h2>Ready to get started?</h2>
+            <p>Join thousands of users already benefiting from our platform. Create your account today and experience
+                the future of e-commerce.</p>
+            <a href="/signup" class="btn btn-primary">Sign Up Now</a>
+        </div>
+    </section>
+
+    <!-- Footer -->
     <footer>
-        <p>&copy; 2025 - NittanyBusiness Project - CMPSC431W</p>
-        <p>Date: Monday March 24th, 2025</p>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>NittanyBusiness</h3>
+                    <ul>
+                        <li><a href="#">About Us</a></li>
+                        <li><a href="#">Careers</a></li>
+                        <li><a href="#">News</a></li>
+                        <li><a href="#">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>For Buyers</h3>
+                    <ul>
+                        <li><a href="#">How to Buy</a></li>
+                        <li><a href="#">Payment Methods</a></li>
+                        <li><a href="#">Shipping</a></li>
+                        <li><a href="#">Returns</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>For Sellers</h3>
+                    <ul>
+                        <li><a href="#">Sell on NittanyBusiness</a></li>
+                        <li><a href="#">Seller Policies</a></li>
+                        <li><a href="#">Marketing Tools</a></li>
+                        <li><a href="#">Seller Dashboard</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Support</h3>
+                    <ul>
+                        <li><a href="#">Help Center</a></li>
+                        <li><a href="#">FAQs</a></li>
+                        <li><a href="#">Contact Support</a></li>
+                        <li><a href="#">User Guides</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2025 - NittanyBusiness Project - CMPSC431W</p>
+                <p>Date: Monday March 24th, 2025</p>
+            </div>
+        </div>
     </footer>
 </body>
+
 </html>

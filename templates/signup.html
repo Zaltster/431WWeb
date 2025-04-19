@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NittanyBusiness - Sign Up</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #1e88e5;
+            --secondary-color: #0d47a1;
+            --accent-color: #64b5f6;
+            --text-color: #333;
+            --light-bg: #f5f5f5;
+            --card-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            --hover-transition: all 0.3s ease;
+            --error-color: #f44336;
+            --success-color: #4caf50;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--light-bg);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header Styles */
+        header {
+            background-color: white;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .logo span {
+            color: var(--secondary-color);
+        }
+
+        /* Main Form Section */
+        .signup-section {
+            padding: 60px 0;
+        }
+
+        .signup-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: var(--card-shadow);
+            overflow: hidden;
+        }
+
+        .form-header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .form-header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .form-body {
+            padding: 40px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: var(--hover-transition);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(30, 136, 229, 0.2);
+        }
+
+        .user-type-selection {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .user-type-option {
+            flex: 1;
+            position: relative;
+        }
+
+        .user-type-option input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .user-type-option label {
+            display: block;
+            background-color: var(--light-bg);
+            padding: 15px;
+            text-align: center;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: var(--hover-transition);
+            border: 2px solid transparent;
+        }
+
+        .user-type-option input[type="radio"]:checked+label {
+            background-color: #e3f2fd;
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .user-type-option label i {
+            display: block;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border-radius: 5px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--hover-transition);
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            width: 100%;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .dynamic-fields {
+            margin-top: 30px;
+            border-top: 1px solid #eee;
+            padding-top: 30px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-col {
+            flex: 1;
+        }
+
+        .error-message {
+            color: var(--error-color);
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .signin-link {
+            text-align: center;
+            margin-top: 25px;
+        }
+
+        .signin-link a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .signin-link a:hover {
+            text-decoration: underline;
+        }
+
+        /* Hidden by default */
+        .buyer-fields,
+        .seller-fields,
+        .helpdesk-fields {
+            display: none;
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+            margin-top: 60px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .form-row {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .user-type-selection {
+                flex-direction: column;
+            }
+
+            .form-body {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <nav class="navbar">
+                <a href="/" class="logo">Nittany<span>Business</span></a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Signup Section -->
+    <section class="signup-section">
+        <div class="container">
+            <div class="signup-container">
+                <div class="form-header">
+                    <h1>Create Your Account</h1>
+                    <p>Join NittanyBusiness and start your e-commerce journey</p>
+                </div>
+                <div class="form-body">
+                    <form id="signup-form" action="/register" method="post">
+                        <!-- User Type Selection -->
+                        <h3>Select Account Type</h3>
+                        <div class="user-type-selection">
+                            <div class="user-type-option">
+                                <input type="radio" id="buyer" name="user_type" value="buyer" checked>
+                                <label for="buyer">
+                                    <i class="fas fa-shopping-cart"></i>
+                                    Buyer
+                                </label>
+                            </div>
+                            <div class="user-type-option">
+                                <input type="radio" id="seller" name="user_type" value="seller">
+                                <label for="seller">
+                                    <i class="fas fa-store"></i>
+                                    Seller
+                                </label>
+                            </div>
+                            <div class="user-type-option">
+                                <input type="radio" id="helpdesk" name="user_type" value="helpdesk">
+                                <label for="helpdesk">
+                                    <i class="fas fa-headset"></i>
+                                    Helpdesk
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Basic Information (Common Fields) -->
+                        <h3>Basic Information</h3>
+                        <div class="form-group">
+                            <label for="email">Email Address</label>
+                            <input type="email" id="email" name="email" class="form-control" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="password">Password</label>
+                            <input type="password" id="password" name="password" class="form-control" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="confirm_password">Confirm Password</label>
+                            <input type="password" id="confirm_password" name="confirm_password" class="form-control"
+                                required>
+                        </div>
+
+                        <!-- Buyer Specific Fields -->
+                        <div id="buyer-fields" class="dynamic-fields buyer-fields">
+                            <h3>Buyer Information</h3>
+
+                            <div class="form-group">
+                                <label for="business_name">Business Name</label>
+                                <input type="text" id="business_name" name="business_name" class="form-control">
+                            </div>
+
+                            <h4>Address Information</h4>
+                            <div class="form-row">
+                                <div class="form-col">
+                                    <div class="form-group">
+                                        <label for="street_num">Street Number</label>
+                                        <input type="text" id="street_num" name="street_num" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="form-col">
+                                    <div class="form-group">
+                                        <label for="street_name">Street Name</label>
+                                        <input type="text" id="street_name" name="street_name" class="form-control">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-col">
+                                    <div class="form-group">
+                                        <label for="city">City</label>
+                                        <input type="text" id="city" name="city" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="form-col">
+                                    <div class="form-group">
+                                        <label for="state">State</label>
+                                        <input type="text" id="state" name="state" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="form-col">
+                                    <div class="form-group">
+                                        <label for="zipcode">Zip Code</label>
+                                        <input type="text" id="zipcode" name="zipcode" class="form-control">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <h4>Payment Information</h4>
+                            <div class="form-group">
+                                <label for="credit_card_num">Credit Card Number</label>
+                                <input type="text" id="credit_card_num" name="credit_card_num" class="form-control">
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-col">
+                                    <div class="form-group">
+                                        <label for="card_type">Card Type</label>
+                                        <select id="card_type" name="card_type" class="form-control">
+                                            <option value="">Select Card Type</option>
+                                            <option value="Visa">Visa</option>
+                                            <option value="MasterCard">MasterCard</option>
+                                            <option value="American Express">American Express</option>
+                                            <option value="Discover">Discover</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-col">
+                                    <div class="form-group">
+                                        <label for="expire_month">Expiration Month</label>
+                                        <select id="expire_month" name="expire_month" class="form-control">
+                                            <option value="">Month</option>
+                                            <option value="01">01</option>
+                                            <option value="02">02</option>
+                                            <option value="03">03</option>
+                                            <option value="04">04</option>
+                                            <option value="05">05</option>
+                                            <option value="06">06</option>
+                                            <option value="07">07</option>
+                                            <option value="08">08</option>
+                                            <option value="09">09</option>
+                                            <option value="10">10</option>
+                                            <option value="11">11</option>
+                                            <option value="12">12</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-col">
+                                    <div class="form-group">
+                                        <label for="expire_year">Expiration Year</label>
+                                        <select id="expire_year" name="expire_year" class="form-control">
+                                            <option value="">Year</option>
+                                            <option value="2025">2025</option>
+                                            <option value="2026">2026</option>
+                                            <option value="2027">2027</option>
+                                            <option value="2028">2028</option>
+                                            <option value="2029">2029</option>
+                                            <option value="2030">2030</option>
+                                            <option value="2031">2031</option>
+                                            <option value="2032">2032</option>
+                                            <option value="2033">2033</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-col">
+                                    <div class="form-group">
+                                        <label for="security_code">Security Code</label>
+                                        <input type="text" id="security_code" name="security_code" class="form-control"
+                                            maxlength="4">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Seller Specific Fields -->
+                        <div id="seller-fields" class="dynamic-fields seller-fields">
+                            <h3>Seller Information</h3>
+
+                            <div class="form-group">
+                                <label for="seller_business_name">Business Name</label>
+                                <input type="text" id="seller_business_name" name="seller_business_name"
+                                    class="form-control">
+                            </div>
+
+                            <h4>Business Address</h4>
+                            <div class="form-row">
+                                <div class="form-col">
+                                    <div class="form-group">
+                                        <label for="seller_street_num">Street Number</label>
+                                        <input type="text" id="seller_street_num" name="seller_street_num"
+                                            class="form-control">
+                                    </div>
+                                </div>
+                                <div class="form-col">
+                                    <div class="form-group">
+                                        <label for="seller_street_name">Street Name</label>
+                                        <input type="text" id="seller_street_name" name="seller_street_name"
+                                            class="form-control">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-col">
+                                    <div class="form-group">
+                                        <label for="seller_city">City</label>
+                                        <input type="text" id="seller_city" name="seller_city" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="form-col">
+                                    <div class="form-group">
+                                        <label for="seller_state">State</label>
+                                        <input type="text" id="seller_state" name="seller_state" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="form-col">
+                                    <div class="form-group">
+                                        <label for="seller_zipcode">Zip Code</label>
+                                        <input type="text" id="seller_zipcode" name="seller_zipcode"
+                                            class="form-control">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <h4>Banking Information</h4>
+                            <div class="form-row">
+                                <div class="form-col">
+                                    <div class="form-group">
+                                        <label for="bank_routing_number">Bank Routing Number</label>
+                                        <input type="text" id="bank_routing_number" name="bank_routing_number"
+                                            class="form-control">
+                                    </div>
+                                </div>
+                                <div class="form-col">
+                                    <div class="form-group">
+                                        <label for="bank_account_number">Bank Account Number</label>
+                                        <input type="text" id="bank_account_number" name="bank_account_number"
+                                            class="form-control">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Helpdesk Specific Fields -->
+                        <div id="helpdesk-fields" class="dynamic-fields helpdesk-fields">
+                            <h3>Helpdesk Information</h3>
+
+                            <div class="form-group">
+                                <label for="position">Position</label>
+                                <select id="position" name="position" class="form-control">
+                                    <option value="">Select Position</option>
+                                    <option value="Support Representative">Support Representative</option>
+                                    <option value="Technical Support">Technical Support</option>
+                                    <option value="Customer Service Manager">Customer Service Manager</option>
+                                    <option value="Account Support">Account Support</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="employee_id">Employee ID (if applicable)</label>
+                                <input type="text" id="employee_id" name="employee_id" class="form-control">
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">Create Account</button>
+
+                        <div class="signin-link">
+                            <p>Already have an account? <a href="/login">Sign In</a></p>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 - NittanyBusiness Project - CMPSC431W</p>
+            <p>Date: Monday March 24th, 2025</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript for Form Toggling -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Get all radio buttons
+            const radioButtons = document.querySelectorAll('input[name="user_type"]');
+
+            // Get all dynamic field containers
+            const buyerFields = document.getElementById('buyer-fields');
+            const sellerFields = document.getElementById('seller-fields');
+            const helpdeskFields = document.getElementById('helpdesk-fields');
+
+            // Function to show the appropriate fields based on selection
+            function toggleFields() {
+                // Hide all fields first
+                buyerFields.style.display = 'none';
+                sellerFields.style.display = 'none';
+                helpdeskFields.style.display = 'none';
+
+                // Show the selected type's fields
+                if (document.getElementById('buyer').checked) {
+                    buyerFields.style.display = 'block';
+                } else if (document.getElementById('seller').checked) {
+                    sellerFields.style.display = 'block';
+                } else if (document.getElementById('helpdesk').checked) {
+                    helpdeskFields.style.display = 'block';
+                }
+            }
+
+            // Add event listeners to all radio buttons
+            radioButtons.forEach(function (radio) {
+                radio.addEventListener('change', toggleFields);
+            });
+
+            // Call the function on page load to set initial state
+            toggleFields();
+
+            // Form validation
+            const form = document.getElementById('signup-form');
+
+            form.addEventListener('submit', function (event) {
+                const password = document.getElementById('password').value;
+                const confirmPassword = document.getElementById('confirm_password').value;
+
+                // Check if passwords match
+                if (password !== confirmPassword) {
+                    event.preventDefault();
+                    alert('Passwords do not match!');
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>
