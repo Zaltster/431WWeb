@@ -501,6 +501,28 @@
                 <i class="fas fa-arrow-left"></i> Back to Dashboard
             </a>
 
+            <!-- Calculate review statistics correctly -->
+            {% set review_count = reviews|length %}
+
+            <!-- Calculate average rating -->
+            {% if review_count > 0 %}
+            {% set total_rating = 0 %}
+            {% for review in reviews %}
+            <!-- Check for different possible field names -->
+            {% if review.Rating is defined %}
+            {% set rating = review.Rating|default(0)|int %}
+            {% elif review.Rate is defined %}
+            {% set rating = review.Rate|default(0)|int %}
+            {% else %}
+            {% set rating = 0 %}
+            {% endif %}
+            {% set total_rating = total_rating + rating %}
+            {% endfor %}
+            {% set avg_rating = (total_rating / review_count)|float %}
+            {% else %}
+            {% set avg_rating = 0 %}
+            {% endif %}
+
             <div class="product-detail-container">
                 <!-- Product Image -->
                 <div class="product-image-container">
@@ -512,14 +534,6 @@
                     <h1 class="product-title">{{ product.Product_Title }}</h1>
                     <div class="product-price">${{ product.Product_Price }}</div>
 
-                    <!-- Calculate actual review count and rating -->
-                    {% set review_count = reviews|length %}
-                    {% set total_rating = 0 %}
-                    {% for review in reviews %}
-                    {% set total_rating = total_rating + review.Rating|int %}
-                    {% endfor %}
-                    {% set avg_rating = (total_rating / review_count) if review_count > 0 else 0 %}
-
                     <div class="product-meta">
                         <div class="product-seller">
                             <div class="seller-info">
@@ -527,21 +541,16 @@
                                 <div class="seller-email">{{ product.seller_email }}</div>
                             </div>
                             <div class="seller-rating">
-                                {% set rating = avg_rating|int %}
-                                {% for i in range(rating) %}
-                                <i class="fas fa-star"></i>
-                                {% endfor %}
+                                {% for i in range(5) %}
+                                {% if i < avg_rating|int %} <i class="fas fa-star"></i>
+                                    {% elif i < avg_rating and i>= avg_rating|int %}
+                                        <i class="fas fa-star-half-alt"></i>
+                                        {% else %}
+                                        <i class="far fa-star"></i>
+                                        {% endif %}
+                                        {% endfor %}
 
-                                {% if (avg_rating - rating) >= 0.5 %}
-                                <i class="fas fa-star-half-alt"></i>
-                                {% set rating = rating + 1 %}
-                                {% endif %}
-
-                                {% for i in range(5 - rating) %}
-                                <i class="far fa-star"></i>
-                                {% endfor %}
-
-                                <span>({{ review_count }} review{% if review_count != 1 %}s{% endif %})</span>
+                                        <span>({{ review_count }} review{% if review_count != 1 %}s{% endif %})</span>
                             </div>
                         </div>
 
@@ -584,19 +593,8 @@
             </div>
 
             <!-- Reviews Section -->
-            <!-- Fixed Reviews Section -->
             <div class="reviews-section">
                 <h2 class="section-title">Customer Reviews</h2>
-
-                <!-- Calculate actual review count -->
-                {% set review_count = reviews|length %}
-
-                <!-- Calculate actual average rating -->
-                {% set total_rating = 0 %}
-                {% for review in reviews %}
-                {% set total_rating = total_rating + review.Rating|int %}
-                {% endfor %}
-                {% set avg_rating = (total_rating / review_count) if review_count > 0 else 0 %}
 
                 <div class="review-summary">
                     <div class="average-rating">
@@ -604,19 +602,14 @@
                     </div>
                     <div class="rating-stars">
                         <div class="stars">
-                            {% set rating = avg_rating|int %}
-                            {% for i in range(rating) %}
-                            <i class="fas fa-star"></i>
-                            {% endfor %}
-
-                            {% if (avg_rating - rating) >= 0.5 %}
-                            <i class="fas fa-star-half-alt"></i>
-                            {% set rating = rating + 1 %}
-                            {% endif %}
-
-                            {% for i in range(5 - rating) %}
-                            <i class="far fa-star"></i>
-                            {% endfor %}
+                            {% for i in range(5) %}
+                            {% if i < avg_rating|int %} <i class="fas fa-star"></i>
+                                {% elif i < avg_rating and i>= avg_rating|int %}
+                                    <i class="fas fa-star-half-alt"></i>
+                                    {% else %}
+                                    <i class="far fa-star"></i>
+                                    {% endif %}
+                                    {% endfor %}
                         </div>
                         <div class="review-count">
                             Based on {{ review_count }} review{% if review_count != 1 %}s{% endif %}
@@ -630,18 +623,33 @@
                     <div class="review-card">
                         <div class="review-header">
                             <div class="reviewer-info">{{ review.Buyer_Email }}</div>
-                            <div class="review-date">Ordered on {{ review.Date }}</div>
+                            <div class="review-date">
+                                {% if review.Date is defined %}
+                                Ordered on {{ review.Date }}
+                                {% endif %}
+                            </div>
                         </div>
                         <div class="review-rating">
-                            {% for i in range(review.Rating|int) %}
+                            <!-- Check for different possible field names -->
+                            {% if review.Rating is defined %}
+                            {% set rating = review.Rating|int %}
+                            {% elif review.Rate is defined %}
+                            {% set rating = review.Rate|int %}
+                            {% else %}
+                            {% set rating = 0 %}
+                            {% endif %}
+
+                            {% for i in range(rating) %}
                             <i class="fas fa-star"></i>
                             {% endfor %}
-                            {% for i in range(5 - review.Rating|int) %}
+                            {% for i in range(5 - rating) %}
                             <i class="far fa-star"></i>
                             {% endfor %}
                         </div>
                         <div class="review-content">
+                            {% if review.Review_Desc is defined %}
                             {{ review.Review_Desc }}
+                            {% endif %}
                         </div>
                     </div>
                     {% endfor %}
