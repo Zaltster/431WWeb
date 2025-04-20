@@ -424,7 +424,7 @@ def buyer_dashboard():
                WHERE o.Listing_ID = pl.Listing_ID) AS review_count
            FROM Product_Listings pl
            JOIN Sellers s ON pl.Seller_Email = s.email
-           WHERE pl.Status = 'active'
+           WHERE pl.Status = 1
            ORDER BY avg_rating DESC, review_count DESC
            LIMIT 6'''
     ).fetchall()
@@ -440,7 +440,7 @@ def buyer_dashboard():
                WHERE o.Listing_ID = pl.Listing_ID) AS review_count
            FROM Product_Listings pl
            JOIN Sellers s ON pl.Seller_Email = s.email
-           WHERE pl.Status = 'active'
+           WHERE pl.Status = 1
            ORDER BY pl.Listing_ID DESC
            LIMIT 6'''
     ).fetchall()
@@ -541,7 +541,7 @@ def product_search():
              WHERE o.Listing_ID = pl.Listing_ID) AS review_count
         FROM Product_Listings pl
         JOIN Sellers s ON pl.Seller_Email = s.email
-        WHERE pl.Status = 'active'
+        WHERE pl.Status = 1
     '''
     
     params = []
@@ -1017,7 +1017,7 @@ def checkout(listing_id):
         '''SELECT pl.*, s.business_name AS seller_name, s.email AS seller_email
            FROM Product_Listings pl
            JOIN Sellers s ON pl.Seller_Email = s.email
-           WHERE pl.Listing_ID = ? AND pl.Status = 'active' ''',
+           WHERE pl.Listing_ID = ? AND pl.Status = 1 ''',
         (listing_id,)
     ).fetchone()
     
@@ -1072,7 +1072,7 @@ def checkout(listing_id):
         
         # Update product quantity
         new_quantity = product['Quantity'] - int(quantity)
-        new_status = 'active' if new_quantity > 0 else 'sold'
+        new_status = 1 if new_quantity > 0 else 'sold'
         
         cursor.execute(
             'UPDATE Product_Listings SET Quantity = ?, Status = ? WHERE Listing_ID = ?',

@@ -1010,7 +1010,8 @@
                                         {% for i in range(rating) %}
                                         <i class="fas fa-star"></i>
                                         {% endfor %}
-                                        {% if (product.avg_rating|default(0) - rating) >= 0.5 %}
+                                        {% set avg_rating = product.avg_rating|default(0)|float %}
+                                        {% if (avg_rating - rating) >= 0.5 %}
                                         <i class="fas fa-star-half-alt"></i>
                                         {% set rating = rating + 1 %}
                                         {% endif %}
@@ -1062,7 +1063,8 @@
                                         {% for i in range(rating) %}
                                         <i class="fas fa-star"></i>
                                         {% endfor %}
-                                        {% if (product.avg_rating|default(0) - rating) >= 0.5 %}
+                                        {% set avg_rating = product.avg_rating|default(0)|float %}
+                                        {% if (avg_rating - rating) >= 0.5 %}
                                         <i class="fas fa-star-half-alt"></i>
                                         {% set rating = rating + 1 %}
                                         {% endif %}
