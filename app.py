@@ -92,19 +92,15 @@ def index():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     error = None
-
     if request.method == 'POST':
         email = request.form['email']
         password = request.form['password']
         remember = 'remember' in request.form
-
         print(f"Login attempt for email: {email}")  # Debug print
-
         # Validate user credentials
         conn = get_db_connection()
         user = conn.execute(
             'SELECT * FROM Users WHERE email = ?', (email,)).fetchone()
-
         # Debug prints
         if user:
             print(f"User found in database: {user['email']}")
@@ -112,39 +108,37 @@ def login():
             print(f"Password hash in DB: {user['password'][:20]}...")
         else:
             print(f"No user found with email: {email}")
-            conn.close()
+        conn.close()
+        if user is None:
             error = "Invalid email address."
+            print(f"Login failed: {error}")  # Debug print
             return render_template('login.html', error=error)
-
         # Calculate SHA-256 hash of the provided password for comparison
         provided_hash = hashlib.sha256(password.encode('utf-8')).hexdigest()
         stored_hash = user['password']
-
         print(f"Comparing hashes:")
         print(f"Stored:   {stored_hash[:20]}...")
         print(f"Provided: {provided_hash[:20]}...")
-
         # Verify the password using direct comparison of SHA-256 hashes
         if provided_hash != stored_hash:
-            conn.close()
             error = "Invalid password."
             print(f"Login failed: {error}")  # Debug print
             return render_template('login.html', error=error)
-
         # Login successful - store user info in session
         print(f"Login successful for {email}")  # Debug print
-        session['user_email'] = email
+        session['user_email'] = user['email']
         
         # Set a longer session lifetime if "remember me" is checked
         if remember:
             session.permanent = True
-
+            
         # Determine user type based on database records
+        conn = get_db_connection()  # Get a fresh connection
         buyer = conn.execute('SELECT * FROM Buyer WHERE email = ?', (email,)).fetchone()
         seller = conn.execute('SELECT * FROM Sellers WHERE email = ?', (email,)).fetchone()
         helpdesk = conn.execute('SELECT * FROM Helpdesk WHERE email = ?', (email,)).fetchone()
         conn.close()
-
+        
         if helpdesk:
             session['user_type'] = 'helpdesk'
             print(f"Redirecting to helpdesk_dashboard")  # Debug print
@@ -161,8 +155,8 @@ def login():
             session['user_type'] = 'user'
             print(f"Redirecting to dashboard")  # Debug print
             return redirect(url_for('dashboard'))
-
-    # GET request - show login page
+    
+    # If it's a GET request or form submission failed validation
     return render_template('login.html', error=error)
 
 # Signup Routing
@@ -422,7 +416,7 @@ def buyer_dashboard():
     # Get featured products
     featured_products = conn.execute(
         '''SELECT pl.*, s.business_name AS seller_name,
-              (SELECT AVG(r.Rate) FROM Reviews r 
+              (SELECT AVG(r.Rating) FROM Reviews r 
                JOIN Orders o ON r.Order_ID = o.Order_ID
                WHERE o.Listing_ID = pl.Listing_ID) AS avg_rating,
               (SELECT COUNT(*) FROM Reviews r 
@@ -438,7 +432,7 @@ def buyer_dashboard():
     # Get recent products
     recent_products = conn.execute(
         '''SELECT pl.*, s.business_name AS seller_name,
-              (SELECT AVG(r.Rate) FROM Reviews r 
+              (SELECT AVG(r.Rating) FROM Reviews r 
                JOIN Orders o ON r.Order_ID = o.Order_ID
                WHERE o.Listing_ID = pl.Listing_ID) AS avg_rating,
               (SELECT COUNT(*) FROM Reviews r 
