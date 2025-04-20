@@ -658,14 +658,14 @@ def submit_review():
     if existing_review:
         # Update existing review
         conn.execute(
-            'UPDATE Reviews SET Rate = ?, Review_Desc = ? WHERE Order_ID = ?',
+            'UPDATE Reviews SET Rating = ?, Review_Desc = ? WHERE Order_ID = ?',
             (rating, review_text, order_id)
         )
         flash('Your review has been updated!')
     else:
         # Create new review
         conn.execute(
-            'INSERT INTO Reviews (Order_ID, Rate, Review_Desc) VALUES (?, ?, ?)',
+            'INSERT INTO Reviews (Order_ID, Rating, Review_Desc) VALUES (?, ?, ?)',
             (order_id, rating, review_text)
         )
         flash('Thank you for your review!')
