@@ -498,7 +498,7 @@ def product_detail(listing_id):
     
     # Calculate average rating
     avg_rating = conn.execute(
-        '''SELECT AVG(r.Rate) AS avg_rating, COUNT(*) AS review_count
+        '''SELECT AVG(r.Rating) AS avg_rating, COUNT(*) AS review_count
            FROM Reviews r
            JOIN Orders o ON r.Order_ID = o.Order_ID
            WHERE o.Listing_ID = ?''',
@@ -533,7 +533,7 @@ def product_search():
     conn = get_db_connection()
     sql_query = '''
         SELECT pl.*, s.business_name AS seller_name,
-            (SELECT AVG(r.Rate) FROM Reviews r 
+            (SELECT AVG(r.Rating) FROM Reviews r 
              JOIN Orders o ON r.Order_ID = o.Order_ID
              WHERE o.Listing_ID = pl.Listing_ID) AS avg_rating,
             (SELECT COUNT(*) FROM Reviews r 
@@ -1103,11 +1103,405 @@ def checkout(listing_id):
     )
 
 # Dashboard routing for seller
+# Add these routes to your app.py file for the seller dashboard functionality
+
 @app.route('/seller_dashboard')
 def seller_dashboard():
+    # Check if user is logged in and is a seller
+    if 'user_email' not in session:
+        return redirect(url_for('login'))
+    
+    if session['user_type'] != 'seller':
+        return redirect(url_for('dashboard'))
+    
+    # Get the current user's information
+    conn = get_db_connection()
+    
+    # Get seller details
+    seller = conn.execute(
+        'SELECT * FROM Sellers WHERE email = ?', 
+        (session['user_email'],)
+    ).fetchone()
+    
+    # Get seller's address
+    address = None
+    if seller and seller['business_address_id']:
+        address = conn.execute(
+            '''SELECT a.*, z.city, z.state 
+               FROM Address a 
+               JOIN Zipcode_Info z ON a.zipcode = z.zipcode 
+               WHERE a.address_id = ?''', 
+            (seller['business_address_id'],)
+        ).fetchone()
+    
+    # Get seller's products
+    products = conn.execute(
+        '''SELECT * FROM Product_Listings 
+           WHERE Seller_Email = ?
+           ORDER BY Listing_ID DESC''',
+        (session['user_email'],)
+    ).fetchall()
+    
+    # Count products by status
+    product_count = len(products)
+    active_product_count = sum(1 for p in products if p['Status'] == 1)
+    
+    # Get orders for seller's products
+    orders = conn.execute(
+        '''SELECT o.*, pl.Product_Title, pl.Product_Description, pl.Product_Price, b.email as buyer_email
+           FROM Orders o
+           JOIN Product_Listings pl ON o.Listing_ID = pl.Listing_ID
+           JOIN Buyer b ON o.Buyer_Email = b.email
+           WHERE o.Seller_Email = ?
+           ORDER BY o.Date DESC''',
+        (session['user_email'],)
+    ).fetchall()
+    
+    order_count = len(orders)
+    
+    # Calculate total revenue
+    total_revenue = sum(float(o['Product_Price']) * int(o['Quantity']) for o in orders)
+    
+    # Calculate average rating for this seller
+    avg_rating_result = conn.execute(
+        '''SELECT AVG(r.Rating) as avg_rating, COUNT(r.Rating) as review_count
+           FROM Reviews r
+           JOIN Orders o ON r.Order_ID = o.Order_ID
+           WHERE o.Seller_Email = ?''',
+        (session['user_email'],)
+    ).fetchone()
+    
+    avg_rating = avg_rating_result['avg_rating'] if avg_rating_result and avg_rating_result['avg_rating'] is not None else None
+    review_count = avg_rating_result['review_count'] if avg_rating_result else 0
+    
+    # Get all categories for the product form
+    categories = conn.execute(
+        'SELECT category_name FROM Categories ORDER BY category_name'
+    ).fetchall()
+    
+    conn.close()
+    
+    # Determine active tab from query parameter or default to 'products'
+    active_tab = request.args.get('tab', 'products')
+    
+    return render_template(
+        'seller_dashboard.html',
+        user_email=session['user_email'],
+        user_type=session['user_type'],
+        seller=seller,
+        address=address,
+        products=products,
+        orders=orders,
+        categories=categories,
+        product_count=product_count,
+        active_product_count=active_product_count,
+        order_count=order_count,
+        total_revenue=total_revenue,
+        avg_rating=avg_rating,
+        review_count=review_count,
+        active_tab=active_tab
+    )
+
+# Route to get product details (for AJAX)
+@app.route('/seller/product/<int:listing_id>')
+def get_product(listing_id):
+    if 'user_email' not in session or session['user_type'] != 'seller':
+        return {'error': 'Unauthorized'}, 401
+    
+    conn = get_db_connection()
+    
+    # Get product
+    product = conn.execute(
+        '''SELECT * FROM Product_Listings 
+           WHERE Listing_ID = ? AND Seller_Email = ?''',
+        (listing_id, session['user_email'])
+    ).fetchone()
+    
+    conn.close()
+    
+    if not product:
+        return {'error': 'Product not found'}, 404
+    
+    # Convert to dict for JSON response
+    return {
+        'Listing_ID': product['Listing_ID'],
+        'Product_Title': product['Product_Title'],
+        'Product_Description': product['Product_Description'],
+        'Category': product['Category'],
+        'Product_Price': product['Product_Price'],
+        'Quantity': product['Quantity'],
+        'Status': product['Status']
+    }
+
+# Route to add a new product
+@app.route('/seller/add_product', methods=['POST'])
+def add_product():
     if 'user_email' not in session or session['user_type'] != 'seller':
         return redirect(url_for('login'))
-    return render_template('dashboard.html', user_email=session['user_email'], user_type='seller')
+    
+    # Extract form data
+    product_title = request.form.get('product_title')
+    product_description = request.form.get('product_description')
+    category = request.form.get('category')
+    product_price = request.form.get('product_price')
+    quantity = request.form.get('quantity')
+    status = request.form.get('status')
+    
+    # For Product_Name, we can use the same value as Product_Title if no separate field exists
+    product_name = product_title  # Use the same value as title if no separate field
+    
+    # Validate inputs
+    if not product_title or not product_description or not category or not product_price or not quantity or status is None:
+        flash('All fields are required')
+        return redirect(url_for('seller_dashboard'))
+    
+    # Insert product
+    conn = get_db_connection()
+    conn.execute(
+        '''INSERT INTO Product_Listings 
+           (Seller_Email, Listing_ID, Category, Product_Title, Product_Name, Product_Description, Quantity, Product_Price, Status) 
+           VALUES (?, (SELECT COALESCE(MAX(Listing_ID), 0) + 1 FROM Product_Listings), ?, ?, ?, ?, ?, ?, ?)''',
+        (session['user_email'], category, product_title, product_name, product_description, quantity, product_price, status)
+    )
+    
+    conn.commit()
+    conn.close()
+    
+    flash('Product added successfully!')
+    return redirect(url_for('seller_dashboard', tab='products'))
+
+# Route to update an existing product
+@app.route('/seller/update_product', methods=['POST'])
+def update_product():
+    if 'user_email' not in session or session['user_type'] != 'seller':
+        return redirect(url_for('login'))
+    
+    # Extract form data
+    listing_id = request.form.get('listing_id')
+    product_title = request.form.get('product_title')
+    product_description = request.form.get('product_description')
+    category = request.form.get('category')
+    product_price = request.form.get('product_price')
+    quantity = request.form.get('quantity')
+    status = request.form.get('status')
+    
+    # Validate inputs
+    if not listing_id or not product_title or not product_description or not category or not product_price or not quantity or status is None:
+        flash('All fields are required')
+        return redirect(url_for('seller_dashboard'))
+    
+    # Update product
+    conn = get_db_connection()
+    
+    # Verify ownership
+    product = conn.execute(
+        'SELECT * FROM Product_Listings WHERE Listing_ID = ? AND Seller_Email = ?',
+        (listing_id, session['user_email'])
+    ).fetchone()
+    
+    if not product:
+        conn.close()
+        flash('Product not found or not authorized')
+        return redirect(url_for('seller_dashboard'))
+    
+    # If quantity is 0, set status to "sold out" (2)
+    if int(quantity) == 0:
+        status = 2
+    
+    # Update the product
+    conn.execute(
+        '''UPDATE Product_Listings 
+           SET Product_Title = ?, Product_Description = ?, Category = ?, 
+               Product_Price = ?, Quantity = ?, Status = ?
+           WHERE Listing_ID = ? AND Seller_Email = ?''',
+        (product_title, product_description, category, product_price, quantity, status, listing_id, session['user_email'])
+    )
+    
+    conn.commit()
+    conn.close()
+    
+    flash('Product updated successfully!')
+    return redirect(url_for('seller_dashboard', tab='products'))
+
+# Route to activate a product
+@app.route('/seller/activate_product/<int:listing_id>')
+def activate_product(listing_id):
+    if 'user_email' not in session or session['user_type'] != 'seller':
+        return redirect(url_for('login'))
+    
+    conn = get_db_connection()
+    
+    # Verify ownership and check quantity
+    product = conn.execute(
+        'SELECT * FROM Product_Listings WHERE Listing_ID = ? AND Seller_Email = ?',
+        (listing_id, session['user_email'])
+    ).fetchone()
+    
+    if not product:
+        conn.close()
+        flash('Product not found or not authorized')
+        return redirect(url_for('seller_dashboard'))
+    
+    # Only activate if there's inventory
+    if product['Quantity'] > 0:
+        conn.execute(
+            'UPDATE Product_Listings SET Status = 1 WHERE Listing_ID = ?',
+            (listing_id,)
+        )
+        flash('Product activated successfully!')
+    else:
+        flash('Cannot activate product with zero quantity.')
+    
+    conn.commit()
+    conn.close()
+    
+    return redirect(url_for('seller_dashboard', tab='products'))
+
+# Route to deactivate a product
+@app.route('/seller/deactivate_product/<int:listing_id>')
+def deactivate_product(listing_id):
+    if 'user_email' not in session or session['user_type'] != 'seller':
+        return redirect(url_for('login'))
+    
+    conn = get_db_connection()
+    
+    # Verify ownership
+    product = conn.execute(
+        'SELECT * FROM Product_Listings WHERE Listing_ID = ? AND Seller_Email = ?',
+        (listing_id, session['user_email'])
+    ).fetchone()
+    
+    if not product:
+        conn.close()
+        flash('Product not found or not authorized')
+        return redirect(url_for('seller_dashboard'))
+    
+    # Deactivate product
+    conn.execute(
+        'UPDATE Product_Listings SET Status = 0 WHERE Listing_ID = ?',
+        (listing_id,)
+    )
+    
+    conn.commit()
+    conn.close()
+    
+    flash('Product deactivated successfully!')
+    return redirect(url_for('seller_dashboard', tab='products'))
+
+# Route for updating seller profile
+@app.route('/update_seller_profile', methods=['POST'])
+def update_seller_profile():
+    if 'user_email' not in session or session['user_type'] != 'seller':
+        return redirect(url_for('login'))
+    
+    # Extract form data
+    business_name = request.form.get('business_name', '')
+    bank_routing_number = request.form.get('bank_routing_number', '')
+    bank_account_number = request.form.get('bank_account_number', '')
+    
+    # Address info
+    street_num = request.form.get('street_num', '')
+    street_name = request.form.get('street_name', '')
+    city = request.form.get('city', '')
+    state = request.form.get('state', '')
+    zipcode = request.form.get('zipcode', '')
+    
+    # Handle street and street name combined
+    if not street_num and not street_name and 'street' in request.form:
+        street_parts = request.form.get('street', '').split(' ', 1)
+        if len(street_parts) > 0:
+            street_num = street_parts[0]
+        if len(street_parts) > 1:
+            street_name = street_parts[1]
+    
+    # Password change
+    current_password = request.form.get('current_password', '')
+    new_password = request.form.get('new_password', '')
+    confirm_password = request.form.get('confirm_password', '')
+    
+    conn = get_db_connection()
+    
+    # Update business name and banking info
+    conn.execute(
+        '''UPDATE Sellers 
+           SET business_name = ?, bank_routing_number = ?, bank_account_number = ? 
+           WHERE email = ?''',
+        (business_name, bank_routing_number, bank_account_number, session['user_email'])
+    )
+    
+    # Handle address update
+    if street_num and street_name and zipcode:
+        # Check if zipcode exists
+        zip_exists = conn.execute(
+            'SELECT * FROM Zipcode_Info WHERE zipcode = ?', 
+            (zipcode,)
+        ).fetchone()
+        
+        if not zip_exists and city and state:
+            conn.execute(
+                'INSERT INTO Zipcode_Info (zipcode, city, state) VALUES (?, ?, ?)',
+                (zipcode, city, state)
+            )
+        
+        # Get current address
+        seller = conn.execute(
+            'SELECT * FROM Sellers WHERE email = ?', 
+            (session['user_email'],)
+        ).fetchone()
+        
+        if seller and seller['business_address_id']:
+            # Update existing address
+            conn.execute(
+                'UPDATE Address SET zipcode = ?, street_num = ?, street_name = ? WHERE address_id = ?',
+                (zipcode, street_num, street_name, seller['business_address_id'])
+            )
+        else:
+            # Create new address
+            conn.execute(
+                'INSERT INTO Address (zipcode, street_num, street_name) VALUES (?, ?, ?)',
+                (zipcode, street_num, street_name)
+            )
+            address_id = conn.execute('SELECT last_insert_rowid()').fetchone()[0]
+            
+            # Link address to seller
+            conn.execute(
+                'UPDATE Sellers SET business_address_id = ? WHERE email = ?',
+                (address_id, session['user_email'])
+            )
+    
+    # Handle password change
+    if current_password and new_password and confirm_password:
+        if new_password != confirm_password:
+            conn.close()
+            flash('New passwords do not match!')
+            return redirect(url_for('seller_dashboard', tab='profile'))
+        
+        # Verify current password
+        user = conn.execute(
+            'SELECT * FROM Users WHERE email = ?', 
+            (session['user_email'],)
+        ).fetchone()
+        
+        current_hash = hashlib.sha256(current_password.encode('utf-8')).hexdigest()
+        
+        if user and user['password'] == current_hash:
+            # Update password
+            new_hash = hashlib.sha256(new_password.encode('utf-8')).hexdigest()
+            conn.execute(
+                'UPDATE Users SET password = ? WHERE email = ?',
+                (new_hash, session['user_email'])
+            )
+            flash('Password updated successfully!')
+        else:
+            conn.close()
+            flash('Current password is incorrect!')
+            return redirect(url_for('seller_dashboard', tab='profile'))
+    
+    conn.commit()
+    conn.close()
+    
+    flash('Profile updated successfully!')
+    return redirect(url_for('seller_dashboard', tab='profile'))
 
 # Logout routing
 @app.route('/logout')
