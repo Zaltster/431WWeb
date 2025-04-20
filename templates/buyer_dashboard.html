@@ -1124,16 +1124,14 @@
                                     <td>{{ order.Seller_Email }}</td>
                                     <td>${{ (order.Product_Price * order.Quantity)|float }}</td>
                                     <td>
-                                        {% if order.Payment == 'completed' %}
+                                        {% if order.Payment > 0 %}
                                         <span class="order-status status-completed">Completed</span>
-                                        {% elif order.Payment == 'processing' %}
-                                        <span class="order-status status-processing">Processing</span>
                                         {% else %}
                                         <span class="order-status status-pending">Pending</span>
                                         {% endif %}
                                     </td>
                                     <td>
-                                        {% if order.Payment == 'completed' %}
+                                        {% if order.Payment > 0 %}
                                         <button class="action-btn review-btn" data-order="{{ order.Order_ID }}"
                                             data-product="{{ order.Product_Title }}">Review</button>
                                         {% endif %}

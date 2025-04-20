@@ -400,17 +400,7 @@ def buyer_dashboard():
     
     # Get all product categories
     categories = conn.execute(
-        '''WITH RECURSIVE category_tree AS (
-               SELECT category_name, parent_category, 0 AS level
-               FROM Categories
-               WHERE parent_category IS NULL
-               UNION ALL
-               SELECT c.category_name, c.parent_category, ct.level + 1
-               FROM Categories c
-               JOIN category_tree ct ON c.parent_category = ct.category_name
-           )
-           SELECT * FROM category_tree
-           ORDER BY level, category_name'''
+        'SELECT category_name FROM Categories ORDER BY category_name'
     ).fetchall()
     
     # Get featured products
@@ -516,7 +506,6 @@ def product_detail(listing_id):
         avg_rating=avg_rating
     )
 
-# Product search route
 @app.route('/product/search')
 def product_search():
     if 'user_email' not in session:
@@ -528,6 +517,9 @@ def product_search():
     min_price = request.args.get('min_price', '')
     max_price = request.args.get('max_price', '')
     sort_by = request.args.get('sort_by', 'relevance')
+    
+    # Debug output
+    print(f"Search parameters: query='{query}', category='{category}', min_price='{min_price}', max_price='{max_price}', sort_by='{sort_by}'")
     
     # Build search SQL query
     conn = get_db_connection()
@@ -576,7 +568,7 @@ def product_search():
     elif sort_by == 'price_high':
         sql_query += ' ORDER BY pl.Product_Price DESC'
     elif sort_by == 'rating':
-        sql_query += ' ORDER BY avg_rating DESC, review_count DESC'
+        sql_query += ' ORDER BY avg_rating DESC NULLS LAST, review_count DESC'
     elif sort_by == 'newest':
         sql_query += ' ORDER BY pl.Listing_ID DESC'
     else:  # Default to relevance
@@ -592,10 +584,19 @@ def product_search():
             params.extend([query_param, query_param, query_param])
         else:
             # If no query, order by rating
-            sql_query += ' ORDER BY avg_rating DESC, review_count DESC'
+            sql_query += ' ORDER BY avg_rating DESC NULLS LAST, review_count DESC'
+    
+    # Print the SQL query for debugging
+    print("SQL Query:", sql_query)
+    print("Params:", params)
     
     # Execute query
-    products = conn.execute(sql_query, params).fetchall()
+    try:
+        products = conn.execute(sql_query, params).fetchall()
+        print(f"Found {len(products)} products.")
+    except Exception as e:
+        print(f"Error executing query: {e}")
+        products = []
     
     # Get all categories for filtering
     categories = conn.execute(
@@ -604,6 +605,9 @@ def product_search():
     
     conn.close()
     
+    # Pass the selected category back to the template
+    selected_category = category
+    
     return render_template(
         'search_results.html',
         user_email=session['user_email'],
@@ -611,7 +615,7 @@ def product_search():
         products=products,
         categories=categories,
         query=query,
-        category=category,
+        category=selected_category,
         min_price=min_price,
         max_price=max_price,
         sort_by=sort_by,
@@ -1062,17 +1066,21 @@ def checkout(listing_id):
         
         # Create order
         cursor = conn.cursor()
+        
+        # Calculate the total payment amount
+        payment_amount = float(product['Product_Price']) * int(quantity)
+        
         cursor.execute(
             '''INSERT INTO Orders (Seller_Email, Listing_ID, Buyer_Email, Date, Quantity, Payment)
                VALUES (?, ?, ?, date('now'), ?, ?)''',
-            (product['Seller_Email'], listing_id, session['user_email'], quantity, 'completed')
+            (product['Seller_Email'], listing_id, session['user_email'], quantity, payment_amount)
         )
         
         order_id = cursor.lastrowid
         
         # Update product quantity
         new_quantity = product['Quantity'] - int(quantity)
-        new_status = 1 if new_quantity > 0 else 'sold'
+        new_status = 1 if new_quantity > 0 else 2  # Use numeric status: 1 for active, 2 for sold out
         
         cursor.execute(
             'UPDATE Product_Listings SET Quantity = ?, Status = ? WHERE Listing_ID = ?',
@@ -1090,7 +1098,9 @@ def checkout(listing_id):
         conn.close()
         
         flash('Order placed successfully!')
-        return redirect(url_for('view_order', order_id=order_id))
+        
+        # Always redirect back to buyer dashboard
+        return redirect(url_for('buyer_dashboard', tab='orders'))
     
     # GET request - show checkout form
     conn.close()

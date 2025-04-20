@@ -906,10 +906,8 @@
                                     <td>{{ order.Quantity }}</td>
                                     <td>${{ "%.2f"|format(order.Product_Price * order.Quantity) }}</td>
                                     <td>
-                                        {% if order.Payment == 'completed' %}
+                                        {% if order.Payment > 0 %}
                                         <span class="order-status status-completed">Completed</span>
-                                        {% elif order.Payment == 'processing' %}
-                                        <span class="order-status status-processing">Processing</span>
                                         {% else %}
                                         <span class="order-status status-pending">Pending</span>
                                         {% endif %}
