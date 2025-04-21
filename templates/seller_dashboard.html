@@ -738,7 +738,8 @@
                     <a href="/seller_dashboard?tab=profile">Profile</a>
                 </div>
                 <div class="user-menu">
-                    <img src="/static/images/user-default.jpg" alt="User Avatar">
+                    <img src="/static/images/user-default.jpg" alt="User Avatar"
+                        onerror="this.onerror=null;this.src='https://placehold.co/40x40/0d47a1/ffffff?text=User';">
                     <span>{{ user_email }}</span>
                     <div class="user-menu-dropdown">
                         <a href="/seller_dashboard?tab=profile"><i class="fas fa-user"></i> My Profile</a>
@@ -838,13 +839,16 @@
                                     <td>${{ "%.2f"|format(product.Product_Price) }}</td>
                                     <td>{{ product.Quantity }}</td>
                                     <td>
-                                        {% if product.Status == 1 %}
+                                        {# Compare product.status with STRINGS '1', '0', '2' #}
+                                        {% if product.status == '1' %}
                                         <span class="product-status status-active">Active</span>
-                                        {% elif product.Status == 0 %}
+                                        {% elif product.status == '0' %}
                                         <span class="product-status status-inactive">Inactive</span>
-                                        {% elif product.Status == 2 %}
+                                        {% elif product.status == '2' %}
                                         <span class="product-status status-sold">Sold Out</span>
-                                        {% endif %}
+                                        {% else %}
+                                        <span class="product-status status-inactive">Unknown ({{ product.status
+                                            }})</span> {% endif %}
                                     </td>
                                     <td>
                                         <button class="action-btn edit-btn"
@@ -935,7 +939,8 @@
             <div class="tab-content {% if active_tab == 'profile' %}active{% endif %}" id="profile-content">
                 <div class="profile-section">
                     <div class="profile-sidebar">
-                        <img src="/static/images/user-default.jpg" alt="User Avatar" class="profile-avatar">
+                        <img src="/static/images/user-default.jpg" alt="User Avatar"
+                            onerror="this.onerror=null;this.src='https://placehold.co/40x40/0d47a1/ffffff?text=User';">
                         <h3 class="profile-name">
                             {% if seller and seller.business_name %}
                             {{ seller.business_name }}

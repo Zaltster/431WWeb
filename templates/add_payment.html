@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NittanyBusiness - Add Payment Method</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Basic styles adapted from your other templates for consistency */
+        :root {
+            --primary-color: #1e88e5;
+            --secondary-color: #0d47a1;
+            --accent-color: #64b5f6;
+            --success-color: #4caf50;
+            --warning-color: #ff9800;
+            --danger-color: #f44336;
+            --text-color: #333;
+            --light-bg: #f5f5f5;
+            --card-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            --hover-transition: all 0.3s ease;
+            --border-color: #e0e0e0;
+            --error-color: #f44336;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--light-bg);
+            color: var(--text-color);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        header {
+            background-color: white;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        header .container {
+            max-width: 1200px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .logo span {
+            color: var(--secondary-color);
+        }
+
+        .header-links a {
+            margin-left: 15px;
+            color: var(--text-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .header-links a:hover {
+            color: var(--primary-color);
+        }
+
+        main {
+            flex: 1;
+            padding: 40px 0;
+        }
+
+        .form-container {
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .page-title {
+            font-size: 28px;
+            color: var(--secondary-color);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border-color);
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        .card-header h2 {
+            font-size: 20px;
+            margin: 0;
+        }
+
+        .card-body {
+            padding: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--secondary-color);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            font-size: 16px;
+            transition: var(--hover-transition);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(30, 136, 229, 0.2);
+        }
+
+        select.form-control {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right .75rem center;
+            background-size: 16px 12px;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border-radius: 5px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--hover-transition);
+            text-decoration: none;
+            display: inline-block;
+            border: none;
+            font-size: 16px;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-1px);
+        }
+
+        .btn-light {
+            background-color: #f8f9fa;
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-light:hover {
+            background-color: #e2e6ea;
+        }
+
+        .action-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        footer {
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+            margin-top: 60px;
+        }
+
+        .flash-messages,
+        .error-div {
+            margin-bottom: 20px;
+            padding: 0 20px;
+        }
+
+        /* Adjusted padding */
+        .flash-message,
+        .error-div {
+            padding: 12px 15px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            animation: fadeIn 0.5s;
+            display: flex;
+            align-items: center;
+        }
+
+        .flash-message i,
+        .error-div i {
+            margin-right: 10px;
+            font-size: 18px;
+        }
+
+        .flash-success {
+            background-color: rgba(76, 175, 80, 0.1);
+            color: var(--success-color);
+            border-left: 4px solid var(--success-color);
+        }
+
+        .flash-error,
+        .error-div {
+            background-color: rgba(244, 67, 54, 0.1);
+            color: var(--danger-color);
+            border-left: 4px solid var(--danger-color);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--primary-color);
+            text-decoration: none;
+            margin-bottom: 25px;
+            font-weight: 500;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 20px;
+        }
+
+        .form-col {
+            flex: 1;
+        }
+
+        /* Adjust column widths for expiry/cvv if needed */
+        .form-col.expiry-month {
+            flex: 0 0 100px;
+        }
+
+        .form-col.expiry-year {
+            flex: 0 0 120px;
+        }
+
+        .form-col.cvv {
+            flex: 0 0 100px;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <nav class="navbar">
+                <a href="/" class="logo">Nittany<span>Business</span></a>
+                <div class="header-links">
+                    <a href="{{ url_for('buyer_dashboard') }}">Dashboard</a>
+                    <a href="{{ url_for('logout') }}">Logout</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+
+    <main>
+        <div class="container">
+            <div class="form-container">
+                <a href="{{ url_for('buyer_dashboard', tab='profile') }}" class="back-link">
+                    <i class="fas fa-arrow-left"></i> Back to Profile
+                </a>
+                <h1 class="page-title">Add New Payment Method</h1>
+
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                <div class="flash-messages">
+                    {% for category, message in messages %}
+                    <div class="flash-message flash-{{ category if category != 'message' else 'error' }}">
+                        <i class="fas fa-{{ 'check-circle' if category == 'success' else 'exclamation-circle' }}"></i>
+                        {{ message }}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                {% endwith %}
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Enter Card Details</h2>
+                    </div>
+                    <div class="card-body">
+                        <form action="{{ url_for('add_payment') }}" method="POST">
+                            <div class="form-group">
+                                <label for="credit_card_num">Credit Card Number</label>
+                                <input type="text" id="credit_card_num" name="credit_card_num" class="form-control"
+                                    required pattern="\d{13,16}" title="Please enter a valid 13 to 16 digit card number"
+                                    placeholder="Enter card number without spaces">
+                            </div>
+                            <div class="form-row">
+                                <div class="form-col">
+                                    <div class="form-group">
+                                        <label for="card_type">Card Type</label>
+                                        <select id="card_type" name="card_type" class="form-control" required>
+                                            <option value="" disabled selected>-- Select --</option>
+                                            <option value="Visa">Visa</option>
+                                            <option value="MasterCard">MasterCard</option>
+                                            <option value="American Express">American Express</option>
+                                            <option value="Discover">Discover</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-col expiry-month">
+                                    <div class="form-group">
+                                        <label for="expire_month">Exp. Month</label>
+                                        <select id="expire_month" name="expire_month" class="form-control" required>
+                                            <option value="" disabled selected>MM</option>
+                                            {% for m in range(1, 13) %}
+                                            <option value="{{ '%02d'|format(m) }}">{{ '%02d'|format(m) }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-col expiry-year">
+                                    <div class="form-group">
+                                        <label for="expire_year">Exp. Year</label>
+                                        <select id="expire_year" name="expire_year" class="form-control" required>
+                                            <option value="" disabled selected>YYYY</option>
+                                            {% set current_year = 2025 %} {% for y in range(current_year, current_year +
+                                            11) %}
+                                            <option value="{{ y }}">{{ y }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-col cvv">
+                                    <div class="form-group">
+                                        <label for="security_code">CVV</label>
+                                        <input type="text" id="security_code" name="security_code" class="form-control"
+                                            required pattern="\d{3,4}" title="Please enter 3 or 4 digits"
+                                            placeholder="e.g. 123">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="action-buttons">
+                                <a href="{{ url_for('buyer_dashboard', tab='profile') }}"
+                                    class="btn btn-light">Cancel</a>
+                                <button type="submit" class="btn btn-primary">Add Payment Method</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 - NittanyBusiness Project - CMPSC431W</p>
+            <p>Date: Monday March 24th, 2025</p>
+        </div>
+    </footer>
+
+</body>
+
+</html>

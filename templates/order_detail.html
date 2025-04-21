@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NittanyBusiness - Order Details</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Add styles similar to your other dashboard/view pages */
+        :root {
+            --primary-color: #1e88e5;
+            --secondary-color: #0d47a1;
+            --accent-color: #64b5f6;
+            --success-color: #4caf50;
+            --warning-color: #ff9800;
+            --danger-color: #f44336;
+            --text-color: #333;
+            --light-bg: #f5f5f5;
+            --card-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            --hover-transition: all 0.3s ease;
+            --border-color: #e0e0e0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--light-bg);
+            color: var(--text-color);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Adjusted max-width */
+        header {
+            background-color: white;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        header .container {
+            max-width: 1200px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .logo span {
+            color: var(--secondary-color);
+        }
+
+        .header-links a {
+            margin-left: 15px;
+            color: var(--text-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .header-links a:hover {
+            color: var(--primary-color);
+        }
+
+        main {
+            flex: 1;
+            padding: 40px 0;
+        }
+
+        .page-title {
+            font-size: 28px;
+            color: var(--secondary-color);
+            margin-bottom: 20px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 25px;
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border-color);
+            background-color: #f8f9fa;
+        }
+
+        .card-header h2 {
+            font-size: 18px;
+            color: var(--secondary-color);
+            margin: 0;
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        footer {
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--primary-color);
+            text-decoration: none;
+            margin-bottom: 25px;
+            font-weight: 500;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .order-details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .detail-item {
+            margin-bottom: 12px;
+            font-size: 16px;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: var(--secondary-color);
+            display: inline-block;
+            width: 130px;
+            /* Adjust width as needed */
+        }
+
+        .review-section {
+            margin-top: 30px;
+        }
+
+        .stars {
+            color: #ffc107;
+        }
+
+        .btn {
+            padding: 10px 18px;
+            border-radius: 5px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--hover-transition);
+            text-decoration: none;
+            display: inline-block;
+            border: none;
+            font-size: 15px;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+        }
+
+        /* Add specific classes if needed */
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <nav class="navbar">
+                <a href="/" class="logo">Nittany<span>Business</span></a>
+                <div class="header-links">
+                    {% if user_type == 'buyer' %}
+                    <a href="{{ url_for('buyer_dashboard') }}">Dashboard</a>
+                    {% elif user_type == 'seller' %}
+                    <a href="{{ url_for('seller_dashboard') }}">Dashboard</a>
+                    {% elif user_type == 'helpdesk' %}
+                    <a href="{{ url_for('helpdesk_dashboard') }}">Dashboard</a>
+                    {% endif %}
+                    <a href="{{ url_for('logout') }}">Logout</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+
+    <main>
+        <div class="container">
+
+            {% if order %}
+            <a href="{{ url_for(user_type ~ '_dashboard', tab='orders') }}" class="back-link">
+                <i class="fas fa-arrow-left"></i> Back to Orders
+            </a>
+            <h1 class="page-title">Order Details #ORD-{{ order.Order_ID }}</h1>
+
+
+            <div class="card">
+                <div class="card-header">
+                    <h2>Order Summary</h2>
+                </div>
+                <div class="card-body order-details-grid">
+                    <div>
+                        <h3>Order Information</h3>
+                        <div class="detail-item"><span class="detail-label">Order ID:</span> #ORD-{{ order.Order_ID }}
+                        </div>
+                        <div class="detail-item"><span class="detail-label">Date Placed:</span> {{ order.Date }}</div>
+                        <div class="detail-item"><span class="detail-label">Status:</span>
+                            {% if order.Payment > 0 %} <span
+                                style="color: var(--success-color); font-weight: bold;">Completed</span> {% else %}
+                            <span style="color: var(--warning-color); font-weight: bold;">Pending</span> {% endif %}
+                        </div>
+                    </div>
+                    <div>
+                        <h3>Product Information</h3>
+                        <div class="detail-item"><span class="detail-label">Product:</span> {{ order.Product_Title }}
+                        </div>
+                        <div class="detail-item"><span class="detail-label">Quantity:</span> {{ order.Quantity }}</div>
+                        <div class="detail-item"><span class="detail-label">Price/Item:</span> ${{
+                            "%.2f"|format(order.Product_Price) }}</div>
+                        <div class="detail-item"><span class="detail-label">Total Amount:</span> ${{
+                            "%.2f"|format(order.Payment) }}</div>
+                    </div>
+                    {% if user_type == 'buyer' %}
+                    <div>
+                        <h3>Seller Information</h3>
+                        <div class="detail-item"><span class="detail-label">Seller Name:</span> {{ order.seller_name }}
+                        </div>
+                        <div class="detail-item"><span class="detail-label">Seller Email:</span> {{ order.Seller_Email
+                            }}</div>
+                    </div>
+                    {% elif user_type == 'seller' or user_type == 'helpdesk' %}
+                    <div>
+                        <h3>Buyer Information</h3>
+                        <div class="detail-item"><span class="detail-label">Buyer Name:</span> {{ order.buyer_name }}
+                        </div>
+                        <div class="detail-item"><span class="detail-label">Buyer Email:</span> {{ order.Buyer_Email }}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                </div>
+            </div>
+
+            <div class="card review-section">
+                <div class="card-header">
+                    <h2>Review Information</h2>
+                </div>
+                <div class="card-body">
+                    {% if review %}
+                    <div class="detail-item">
+                        <span class="detail-label">Rating:</span>
+                        <span class="stars">
+                            {% for i in range(review.Rating) %}<i class="fas fa-star"></i>{% endfor %}{% for i in
+                            range(5 - review.Rating) %}<i class="far fa-star"></i>{% endfor %}
+                        </span>
+                    </div>
+                    <div class="detail-item"><span class="detail-label">Comment:</span>
+                        <p style="margin-top: 5px;">{{ review.Review_Desc if review.Review_Desc else 'No comment
+                            provided.' }}</p>
+                    </div>
+                    {% elif user_type == 'buyer' and order.Payment > 0 %}
+                    <p>You haven't reviewed this order yet.</p>
+                    <button class="btn btn-primary review-btn" data-order="{{ order.Order_ID }}"
+                        data-product="{{ order.Product_Title }}">Write a Review</button>
+                    {% else %}
+                    <p>No review submitted for this order.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            {% else %}
+            <h1 class="page-title">Order Not Found</h1>
+            <p>The requested order could not be found or you do not have permission to view it.</p>
+            <a href="{{ url_for(user_type ~ '_dashboard') if user_type else url_for('index') }}" class="back-link">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+            {% endif %}
+
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 - NittanyBusiness Project - CMPSC431W</p>
+            <p>Date: Monday March 24th, 2025</p>
+        </div>
+    </footer>
+
+</body>
+
+</html>

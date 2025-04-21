@@ -434,7 +434,8 @@
                     <a href="/buyer_dashboard?tab=profile">Profile</a>
                 </div>
                 <div class="user-menu">
-                    <img src="/static/images/user-default.jpg" alt="User Avatar">
+                    <img src="/static/images/user-default.jpg" alt="User Avatar"
+                        onerror="this.onerror=null;this.src='https://placehold.co/40x40/0d47a1/ffffff?text=User';">
                     <span>{{ user_email }}</span>
                     <div class="user-menu-dropdown">
                         <a href="/buyer_dashboard?tab=profile"><i class="fas fa-user"></i> My Profile</a>
@@ -569,7 +570,7 @@
         </div>
     </footer>
 
-    <!-- No JavaScript needed -->
+
 </body>
 
 </html>
