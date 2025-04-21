@@ -1789,7 +1789,79 @@ def update_seller_profile():
     
     flash('Profile updated successfully!')
     return redirect(url_for('seller_dashboard', tab='profile'))
+@app.route('/create_helpdesk_user', methods=['GET', 'POST'])
+def create_helpdesk_user():
+    # --- Authorization Check ---
+    if 'user_email' not in session or session.get('user_type') != 'helpdesk':
+        flash("You are not authorized to access this page.", "error")
+        return redirect(url_for('login')) # Or redirect to their own dashboard
 
+    error = None # Initialize error variable
+
+    if request.method == 'POST':
+        email = request.form.get('email')
+        position = request.form.get('position')
+        password = request.form.get('password')
+        confirm_password = request.form.get('confirm_password')
+
+        # --- Basic Validation ---
+        if not email or not position or not password or not confirm_password:
+            error = "All fields are required."
+        elif password != confirm_password:
+            error = "Passwords do not match."
+        # Optional: Add more robust email validation if needed
+        elif not re.match(r"[^@]+@[^@]+\.[^@]+", email):
+             error = "Invalid email format."
+
+        if error:
+            # Re-render the form with the error message
+            return render_template('create_helpdesk_user.html', error=error, user_email=session['user_email'], user_type=session['user_type'])
+
+        conn = None # Initialize conn
+        try:
+            conn = get_db_connection()
+            cursor = conn.cursor()
+
+            # Check if email already exists
+            existing_user = cursor.execute('SELECT email FROM Users WHERE email = ?', (email,)).fetchone()
+            if existing_user:
+                error = "Email address already exists."
+                conn.close()
+                return render_template('create_helpdesk_user.html', error=error, user_email=session['user_email'], user_type=session['user_type'])
+
+            # Hash the password
+            password_hash = hashlib.sha256(password.encode('utf-8')).hexdigest()
+
+            # Insert into Users table
+            cursor.execute('INSERT INTO Users (email, password) VALUES (?, ?)', (email, password_hash))
+
+            # Insert into Helpdesk table
+            cursor.execute('INSERT INTO Helpdesk (email, position) VALUES (?, ?)', (email, position))
+
+            conn.commit()
+            flash(f"Helpdesk user '{email}' created successfully!", "success")
+            return redirect(url_for('helpdesk_dashboard')) # Redirect back to dashboard
+
+        except sqlite3.Error as e:
+            if conn:
+                conn.rollback() # Rollback changes on error
+            error = f"Database error: {e}"
+            print(f"Database error creating helpdesk user: {e}") # Log the error
+            return render_template('create_helpdesk_user.html', error=error, user_email=session['user_email'], user_type=session['user_type'])
+        except Exception as e:
+            # Catch any other unexpected errors
+             if conn:
+                conn.rollback()
+             error = f"An unexpected error occurred: {e}"
+             print(f"Unexpected error creating helpdesk user: {e}") # Log the error
+             return render_template('create_helpdesk_user.html', error=error, user_email=session['user_email'], user_type=session['user_type'])
+        finally:
+            if conn:
+                conn.close()
+
+    # --- GET Request ---
+    # Pass current user info for the template's header/footer if needed
+    return render_template('create_helpdesk_user.html', user_email=session['user_email'], user_type=session['user_type'])
 # Logout routing
 @app.route('/logout')
 def logout():

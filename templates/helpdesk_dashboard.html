@@ -568,6 +568,8 @@
                     <span>{{ user_email }}</span>
                     <div class="user-menu-dropdown">
                         <a href="/helpdesk_dashboard?tab=profile"><i class="fas fa-user"></i> My Profile</a>
+                        <a href="{{ url_for('create_helpdesk_user') }}"><i class="fas fa-user-plus"></i> Create Helpdesk
+                            User</a>
                         <a href="/helpdesk_dashboard?tab=unassigned"><i class="fas fa-inbox"></i> Unassigned
                             Requests</a>
                         <a href="/helpdesk_dashboard?tab=assigned"><i class="fas fa-tasks"></i> My Requests</a>

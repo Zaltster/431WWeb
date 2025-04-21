@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NittanyBusiness - Create Helpdesk User</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Basic styles adapted from your other templates */
+        :root {
+            --primary-color: #1e88e5;
+            --secondary-color: #0d47a1;
+            --accent-color: #64b5f6;
+            --success-color: #4caf50;
+            --warning-color: #ff9800;
+            --danger-color: #f44336;
+            --text-color: #333;
+            --light-bg: #f5f5f5;
+            --card-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            --hover-transition: all 0.3s ease;
+            --border-color: #e0e0e0;
+            --error-color: #f44336;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--light-bg);
+            color: var(--text-color);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        header {
+            background-color: white;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            padding: 15px 0;
+            margin-bottom: 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        header .container {
+            max-width: 1200px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .logo span {
+            color: var(--secondary-color);
+        }
+
+        .header-links a {
+            margin-left: 15px;
+            color: var(--text-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .header-links a:hover {
+            color: var(--primary-color);
+        }
+
+        main {
+            flex: 1;
+            padding: 40px 0;
+        }
+
+        .form-container {
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .page-title {
+            font-size: 28px;
+            color: var(--secondary-color);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border-color);
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        .card-header h2 {
+            font-size: 20px;
+            margin: 0;
+        }
+
+        .card-body {
+            padding: 30px;
+        }
+
+        /* More padding */
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        /* More spacing */
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            /* Bold labels */
+            color: var(--secondary-color);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            font-size: 16px;
+            transition: var(--hover-transition);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(30, 136, 229, 0.2);
+        }
+
+        /* Enhanced focus */
+        select.form-control {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right .75rem center;
+            background-size: 16px 12px;
+        }
+
+        /* Custom dropdown arrow */
+
+        .btn {
+            padding: 12px 25px;
+            /* More horizontal padding */
+            border-radius: 5px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--hover-transition);
+            text-decoration: none;
+            display: inline-block;
+            border: none;
+            font-size: 16px;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-1px);
+        }
+
+        /* Slight lift on hover */
+        .btn-light {
+            background-color: #f8f9fa;
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-light:hover {
+            background-color: #e2e6ea;
+        }
+
+        .action-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            margin-top: 30px;
+            /* More space above buttons */
+        }
+
+        footer {
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+            margin-top: 60px;
+        }
+
+        /* More space before footer */
+        .flash-messages,
+        .error-div {
+            margin-bottom: 20px;
+            padding: 0 20px;
+        }
+
+        /* Add padding to container */
+        .flash-message,
+        .error-div {
+            padding: 12px 15px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            animation: fadeIn 0.5s;
+            display: flex;
+            align-items: center;
+        }
+
+        .flash-message i,
+        .error-div i {
+            margin-right: 10px;
+            font-size: 18px;
+        }
+
+        .flash-success {
+            background-color: rgba(76, 175, 80, 0.1);
+            color: var(--success-color);
+            border-left: 4px solid var(--success-color);
+        }
+
+        .flash-error,
+        .error-div {
+            background-color: rgba(244, 67, 54, 0.1);
+            color: var(--danger-color);
+            border-left: 4px solid var(--danger-color);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--primary-color);
+            text-decoration: none;
+            margin-bottom: 25px;
+            font-weight: 500;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <nav class="navbar">
+                <a href="/" class="logo">Nittany<span>Business</span></a>
+                <div class="header-links">
+                    <a href="{{ url_for('helpdesk_dashboard') }}">Helpdesk Dashboard</a>
+                    <a href="{{ url_for('logout') }}">Logout</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <div class="form-container">
+
+                <a href="{{ url_for('helpdesk_dashboard') }}" class="back-link">
+                    <i class="fas fa-arrow-left"></i> Back to Helpdesk Dashboard
+                </a>
+
+                <h1 class="page-title">Create New Helpdesk User Account</h1>
+
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                <div class="flash-messages">
+                    {% for category, message in messages %}
+                    <div class="flash-message flash-{{ category if category else 'success' }}">
+                        <i class="fas fa-{{ 'check-circle' if category == 'success' else 'exclamation-circle' }}"></i>
+                        {{ message }}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                {% endwith %}
+                {% if error %}
+                <div class="error-div">
+                    <i class="fas fa-exclamation-circle"></i> {{ error }}
+                </div>
+                {% endif %}
+                <div class="card">
+                    <div class="card-header">
+                        <h2>New Account Details</h2>
+                    </div>
+                    <div class="card-body">
+                        <form action="{{ url_for('create_helpdesk_user') }}" method="POST" id="create-helpdesk-form">
+                            <div class="form-group">
+                                <label for="email">Email Address</label>
+                                <input type="email" id="email" name="email" class="form-control"
+                                    placeholder="e.g., new.staff@nittybiz.com" required>
+                                <small style="font-size: 0.85em; color: #666;">Must be a valid email address.</small>
+                            </div>
+                            <div class="form-group">
+                                <label for="position">Position</label>
+                                <select id="position" name="position" class="form-control" required>
+                                    <option value="" disabled selected>-- Select Position --</option>
+                                    <option value="Support Representative">Support Representative</option>
+                                    <option value="Technical Support">Technical Support</option>
+                                    <option value="Customer Service Manager">Customer Service Manager</option>
+                                    <option value="Account Support">Account Support</option>
+                                    <option value="Administrator">Administrator</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="password">Password</label>
+                                <input type="password" id="password" name="password" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="confirm_password">Confirm Password</label>
+                                <input type="password" id="confirm_password" name="confirm_password"
+                                    class="form-control" required>
+                            </div>
+                            <div class="action-buttons">
+                                <a href="{{ url_for('helpdesk_dashboard') }}" class="btn btn-light">Cancel</a>
+                                <button type="submit" class="btn btn-primary">Create User</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 - NittanyBusiness Project - CMPSC431W</p>
+            <p>Date: Monday March 24th, 2025</p>
+        </div>
+    </footer>
+
+    <script>
+        // Optional: Client-side password match validation
+        const form = document.getElementById('create-helpdesk-form');
+        const passwordInput = document.getElementById('password');
+        const confirmPasswordInput = document.getElementById('confirm_password');
+
+        function validatePasswordMatch() {
+            if (passwordInput.value !== confirmPasswordInput.value) {
+                confirmPasswordInput.setCustomValidity("Passwords do not match."); // Use browser validation API
+            } else {
+                confirmPasswordInput.setCustomValidity(""); // Clear error if they match
+            }
+        }
+
+        passwordInput.addEventListener('change', validatePasswordMatch);
+        confirmPasswordInput.addEventListener('keyup', validatePasswordMatch); // Check as they type in confirm field
+
+        // Also check on form submit as a fallback
+        form.addEventListener('submit', function (event) {
+            if (passwordInput.value !== confirmPasswordInput.value) {
+                event.preventDefault(); // Stop form submission
+                // Ensure the validation message is shown
+                confirmPasswordInput.setCustomValidity("Passwords do not match.");
+                alert('Passwords do not match!'); // Also alert for immediate feedback
+                confirmPasswordInput.reportValidity(); // Trigger browser's validation UI
+            }
+        });
+    </script>
+</body>
+
+</html>
