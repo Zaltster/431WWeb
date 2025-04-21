@@ -345,11 +345,270 @@ def dashboard():
     return render_template('dashboard.html', user_email=session['user_email'], user_type=session['user_type'])
 
 # Dashboard routing for helpdesk
+# Dashboard routing for helpdesk
+# Helpdesk Dashboard Route
 @app.route('/helpdesk_dashboard')
 def helpdesk_dashboard():
+    if 'user_email' not in session:
+        return redirect(url_for('login'))
+    
+    if session['user_type'] != 'helpdesk':
+        return redirect(url_for('dashboard'))
+    
+    # Get active tab from query parameter or default to 'unassigned'
+    active_tab = request.args.get('tab', 'unassigned')
+    
+    conn = get_db_connection()
+    
+    # Get helpdesk staff details
+    helpdesk = conn.execute(
+        'SELECT * FROM Helpdesk WHERE email = ?', 
+        (session['user_email'],)
+    ).fetchone()
+    
+    # Get unassigned requests (assigned to helpdeskteam@nittybiz.com)
+    unassigned_requests = conn.execute(
+        '''SELECT * FROM Requests
+           WHERE helpdesk_staff_email = 'helpdeskteam@nittybiz.com'
+           AND request_status = 0
+           ORDER BY request_id DESC'''
+    ).fetchall()
+    
+    # Get assigned requests (assigned to current staff)
+    assigned_requests = conn.execute(
+        '''SELECT * FROM Requests
+           WHERE helpdesk_staff_email = ?
+           AND request_status = 1
+           ORDER BY request_id DESC''',
+        (session['user_email'],)
+    ).fetchall()
+    
+    # Get completed requests
+    completed_requests = conn.execute(
+        '''SELECT * FROM Requests
+           WHERE helpdesk_staff_email = ?
+           AND request_status = 2
+           ORDER BY request_id DESC''',
+        (session['user_email'],)
+    ).fetchall()
+    
+    # Count requests
+    unassigned_count = len(unassigned_requests)
+    assigned_count = len(assigned_requests)
+    completed_count = conn.execute(
+        '''SELECT COUNT(*) FROM Requests
+           WHERE helpdesk_staff_email = ?
+           AND request_status = 2''',
+        (session['user_email'],)
+    ).fetchone()[0]
+    
+    conn.close()
+    
+    return render_template(
+        'helpdesk_dashboard.html',
+        user_email=session['user_email'],
+        user_type=session['user_type'],
+        position=helpdesk['position'] if helpdesk else '',
+        unassigned_requests=unassigned_requests,
+        assigned_requests=assigned_requests,
+        completed_requests=completed_requests,
+        unassigned_count=unassigned_count,
+        assigned_count=assigned_count,
+        completed_count=completed_count,
+        active_tab=active_tab
+    )
+
+# View Request Route
+@app.route('/view_request/<int:request_id>')
+def view_request(request_id):
     if 'user_email' not in session or session['user_type'] != 'helpdesk':
         return redirect(url_for('login'))
-    return render_template('dashboard.html', user_email=session['user_email'], user_type='helpdesk')
+    
+    conn = get_db_connection()
+    
+    # Get request details
+    request = conn.execute(
+        'SELECT * FROM Requests WHERE request_id = ?',
+        (request_id,)
+    ).fetchone()
+    
+    if not request:
+        conn.close()
+        flash('Request not found')
+        return redirect(url_for('helpdesk_dashboard'))
+    
+    # Get all categories for category form
+    categories = conn.execute(
+        'SELECT * FROM Categories ORDER BY category_name'
+    ).fetchall()
+    
+    conn.close()
+    
+    return render_template(
+        'view_request.html',
+        user_email=session['user_email'],
+        user_type=session['user_type'],
+        request=request,
+        categories=categories
+    )
+
+# Claim Request Route
+@app.route('/claim_request/<int:request_id>')
+def claim_request(request_id):
+    if 'user_email' not in session or session['user_type'] != 'helpdesk':
+        return redirect(url_for('login'))
+    
+    conn = get_db_connection()
+    
+    # Check if request exists and is unassigned
+    request = conn.execute(
+        '''SELECT * FROM Requests 
+           WHERE request_id = ? 
+           AND helpdesk_staff_email = 'helpdeskteam@nittybiz.com'
+           AND request_status = 0''',
+        (request_id,)
+    ).fetchone()
+    
+    if not request:
+        conn.close()
+        flash('Request not found or already assigned')
+        return redirect(url_for('helpdesk_dashboard'))
+    
+    # Assign request to current staff member
+    conn.execute(
+        '''UPDATE Requests 
+           SET helpdesk_staff_email = ?, request_status = 1
+           WHERE request_id = ?''',
+        (session['user_email'], request_id)
+    )
+    
+    conn.commit()
+    conn.close()
+    
+    flash('Request successfully claimed')
+    return redirect(url_for('helpdesk_dashboard', tab='assigned'))
+
+# Complete Request Route
+@app.route('/complete_request/<int:request_id>', methods=['GET', 'POST'])
+def complete_request(request_id):
+    if 'user_email' not in session or session['user_type'] != 'helpdesk':
+        return redirect(url_for('login'))
+    
+    conn = get_db_connection()
+    
+    # Check if request exists and is assigned to current staff
+    helpdesk_request = conn.execute(
+        '''SELECT * FROM Requests 
+           WHERE request_id = ? 
+           AND helpdesk_staff_email = ?
+           AND request_status = 1''',
+        (request_id, session['user_email'])
+    ).fetchone()
+    
+    if not helpdesk_request:
+        conn.close()
+        flash('Request not found or not assigned to you')
+        return redirect(url_for('helpdesk_dashboard'))
+    
+    # Handle form submission for adding category
+    if request.method == 'POST' and helpdesk_request['request_type'] == 'Add New Category':
+        category_name = request.form.get('category_name')
+        parent_category = request.form.get('parent_category') or None
+        
+        # Check if category already exists
+        existing_category = conn.execute(
+            'SELECT * FROM Categories WHERE category_name = ?',
+            (category_name,)
+        ).fetchone()
+        
+        if existing_category:
+            conn.close()
+            flash('Category already exists')
+            return redirect(url_for('view_request', request_id=request_id))
+        
+        # Add new category
+        conn.execute(
+            'INSERT INTO Categories (category_name, parent_category) VALUES (?, ?)',
+            (category_name, parent_category)
+        )
+        
+        # Mark request as completed
+        conn.execute(
+            'UPDATE Requests SET request_status = 2 WHERE request_id = ?',
+            (request_id,)
+        )
+        
+        conn.commit()
+        conn.close()
+        
+        flash('Category added and request marked as completed')
+        return redirect(url_for('helpdesk_dashboard', tab='completed'))
+    
+    # For GET requests, show form to complete the request
+    if helpdesk_request['request_type'] == 'Add New Category':
+        # Get all categories for parent selection
+        categories = conn.execute(
+            'SELECT * FROM Categories ORDER BY category_name'
+        ).fetchall()
+        
+        conn.close()
+        
+        return render_template(
+            'add_category.html',
+            user_email=session['user_email'],
+            user_type=session['user_type'],
+            request=helpdesk_request,
+            categories=categories
+        )
+    
+    # For other request types (not implemented in this phase)
+    conn.execute(
+        'UPDATE Requests SET request_status = 2 WHERE request_id = ?',
+        (request_id,)
+    )
+    
+    conn.commit()
+    conn.close()
+    
+    flash('Request marked as completed')
+    return redirect(url_for('helpdesk_dashboard', tab='completed'))
+
+# Submit Request Route (for buyers and sellers)
+@app.route('/submit_request', methods=['GET', 'POST'])
+def submit_request():
+    if 'user_email' not in session or session['user_type'] not in ['buyer', 'seller']:
+        return redirect(url_for('login'))
+    
+    if request.method == 'POST':
+        request_type = request.form.get('request_type')
+        request_desc = request.form.get('request_desc')
+        
+        if not request_type or not request_desc:
+            flash('All fields are required')
+            return render_template('submit_request.html', user_email=session['user_email'], user_type=session['user_type'])
+        
+        conn = get_db_connection()
+        
+        # Create new request
+        conn.execute(
+            '''INSERT INTO Requests 
+               (sender_email, helpdesk_staff_email, request_type, request_desc, request_status) 
+               VALUES (?, 'helpdeskteam@nittybiz.com', ?, ?, 0)''',
+            (session['user_email'], request_type, request_desc)
+        )
+        
+        conn.commit()
+        conn.close()
+        
+        flash('Your request has been submitted')
+        return redirect(url_for(f'{session["user_type"]}_dashboard'))
+    
+    # Show request form
+    return render_template(
+        'submit_request.html',
+        user_email=session['user_email'],
+        user_type=session['user_type']
+    )
 
 # Buyer Dashboard routing
 @app.route('/buyer_dashboard')
@@ -457,53 +716,71 @@ def buyer_dashboard():
 # Product detail route
 @app.route('/product/<int:listing_id>')
 def product_detail(listing_id):
+    # Check if user is logged in
     if 'user_email' not in session:
+        flash('Please log in to view product details.', 'warning')
         return redirect(url_for('login'))
-    
-    conn = get_db_connection()
-    
-    # Get product details
-    product = conn.execute(
-        '''SELECT pl.*, s.business_name AS seller_name, s.email AS seller_email
-           FROM Product_Listings pl
-           JOIN Sellers s ON pl.Seller_Email = s.email
-           WHERE pl.Listing_ID = ?''',
-        (listing_id,)
-    ).fetchone()
-    
-    if not product:
-        conn.close()
-        flash('Product not found')
+
+    conn = None # Initialize conn to None
+    try:
+        conn = get_db_connection() # Establish database connection
+
+        # --- Get Product Details ---
+        # Fetch product information along with seller details using a JOIN
+        product = conn.execute(
+            '''SELECT pl.*, s.business_name AS seller_name, s.email AS seller_email
+               FROM Product_Listings pl
+               JOIN Sellers s ON pl.Seller_Email = s.email
+               WHERE pl.Listing_ID = ?''',
+            (listing_id,)
+        ).fetchone()
+
+        # Handle case where product is not found
+        if not product:
+            flash('Product not found.', 'danger')
+            return redirect(url_for('buyer_dashboard'))
+
+        # --- Get Product Reviews ---
+        # Fetch reviews associated with the product, joining with Orders to get buyer email and order date
+        reviews = conn.execute(
+            '''SELECT r.*, o.Buyer_Email, o.Date
+               FROM Reviews r
+               JOIN Orders o ON r.Order_ID = o.Order_ID
+               WHERE o.Listing_ID = ?
+               ORDER BY o.Date DESC''', # Order reviews by date, newest first
+            (listing_id,)
+        ).fetchall()
+
+        # --- Calculate Average Rating and Review Count ---
+        # Use SQL AVG() and COUNT() for efficiency. Fetch a single row with the results.
+        # Use COALESCE to handle cases with no reviews (AVG returns NULL), defaulting to 0.0
+        rating_data = conn.execute(
+            '''SELECT COALESCE(AVG(r.Rating), 0.0) AS average, COUNT(r.Rating) AS count
+               FROM Reviews r
+               JOIN Orders o ON r.Order_ID = o.Order_ID
+               WHERE o.Listing_ID = ?''',
+            (listing_id,)
+        ).fetchone()
+
+    except Exception as e:
+        # Basic error handling for database operations
+        flash(f'An error occurred: {e}', 'danger')
+        # Redirect to a safe page, like the dashboard
         return redirect(url_for('buyer_dashboard'))
-    
-    # Get product reviews
-    reviews = conn.execute(
-        '''SELECT r.*, o.Buyer_Email
-           FROM Reviews r
-           JOIN Orders o ON r.Order_ID = o.Order_ID
-           WHERE o.Listing_ID = ?
-           ORDER BY o.Date DESC''',
-        (listing_id,)
-    ).fetchall()
-    
-    # Calculate average rating
-    avg_rating = conn.execute(
-        '''SELECT AVG(r.Rating) AS avg_rating, COUNT(*) AS review_count
-           FROM Reviews r
-           JOIN Orders o ON r.Order_ID = o.Order_ID
-           WHERE o.Listing_ID = ?''',
-        (listing_id,)
-    ).fetchone()
-    
-    conn.close()
-    
+    finally:
+        # Ensure the database connection is always closed
+        if conn:
+            conn.close()
+
+    # Render the template, passing all necessary data
     return render_template(
         'product_detail.html',
         user_email=session['user_email'],
         user_type=session['user_type'],
         product=product,
         reviews=reviews,
-        avg_rating=avg_rating
+        # Pass the rating_data object containing 'average' and 'count'
+        rating_data=rating_data
     )
 
 @app.route('/product/search')

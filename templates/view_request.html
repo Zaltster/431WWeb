@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NittanyBusiness - View Request</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #1e88e5;
+            --secondary-color: #0d47a1;
+            --accent-color: #64b5f6;
+            --success-color: #4caf50;
+            --warning-color: #ff9800;
+            --danger-color: #f44336;
+            --text-color: #333;
+            --light-bg: #f5f5f5;
+            --card-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            --hover-transition: all 0.3s ease;
+            --border-color: #e0e0e0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--light-bg);
+            color: var(--text-color);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header Styles */
+        header {
+            background-color: white;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .logo span {
+            color: var(--secondary-color);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-links a {
+            color: var(--text-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--hover-transition);
+        }
+
+        .nav-links a:hover {
+            color: var(--primary-color);
+        }
+
+        .user-menu {
+            position: relative;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .user-menu img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+
+        .user-menu-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background-color: white;
+            box-shadow: var(--card-shadow);
+            border-radius: 5px;
+            width: 200px;
+            z-index: 100;
+            display: none;
+        }
+
+        .user-menu:hover .user-menu-dropdown {
+            display: block;
+        }
+
+        .user-menu-dropdown a {
+            display: block;
+            padding: 10px 15px;
+            color: var(--text-color);
+            text-decoration: none;
+            transition: var(--hover-transition);
+        }
+
+        .user-menu-dropdown a:hover {
+            background-color: var(--light-bg);
+        }
+
+        .user-menu-dropdown .logout {
+            border-top: 1px solid var(--border-color);
+            color: var(--danger-color);
+        }
+
+        /* Main Content Styles */
+        main {
+            flex: 1;
+            padding: 40px 0;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--primary-color);
+            text-decoration: none;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .request-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .page-title {
+            font-size: 28px;
+            color: var(--secondary-color);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        /* Request Details Card */
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        .card-header h2 {
+            font-size: 20px;
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        .detail-row {
+            display: flex;
+            margin-bottom: 15px;
+            border-bottom: 1px solid var(--light-bg);
+            padding-bottom: 15px;
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .detail-label {
+            flex: 0 0 30%;
+            font-weight: 600;
+            color: var(--secondary-color);
+        }
+
+        .detail-value {
+            flex: 1;
+        }
+
+        .request-status {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .status-unassigned {
+            background-color: rgba(255, 152, 0, 0.1);
+            color: var(--warning-color);
+        }
+
+        .status-assigned {
+            background-color: rgba(33, 150, 243, 0.1);
+            color: var(--primary-color);
+        }
+
+        .status-completed {
+            background-color: rgba(76, 175, 80, 0.1);
+            color: var(--success-color);
+        }
+
+        .request-description {
+            background-color: var(--light-bg);
+            padding: 15px;
+            border-radius: 5px;
+            white-space: pre-line;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border-radius: 5px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--hover-transition);
+            text-decoration: none;
+            display: inline-block;
+            border: none;
+            font-size: 16px;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .btn-success {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background-color: #388e3c;
+        }
+
+        .btn-light {
+            background-color: #e0e0e0;
+            color: var(--text-color);
+        }
+
+        .btn-light:hover {
+            background-color: #d0d0d0;
+        }
+
+        /* For new category form */
+        .form-container {
+            margin-top: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            font-size: 16px;
+            transition: var(--hover-transition);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(30, 136, 229, 0.2);
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        /* Flash messages */
+        .flash-messages {
+            margin-bottom: 20px;
+        }
+
+        .flash-message {
+            padding: 12px 15px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            animation: fadeIn 0.5s;
+        }
+
+        .flash-success {
+            background-color: rgba(76, 175, 80, 0.1);
+            color: var(--success-color);
+            border-left: 4px solid var(--success-color);
+        }
+
+        .flash-error {
+            background-color: rgba(244, 67, 54, 0.1);
+            color: var(--danger-color);
+            border-left: 4px solid var(--danger-color);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <nav class="navbar">
+                <a href="/" class="logo">Nittany<span>Business</span></a>
+                <div class="nav-links">
+                    <a href="/helpdesk_dashboard">Dashboard</a>
+                    <a href="/helpdesk_dashboard?tab=unassigned">Unassigned Requests</a>
+                    <a href="/helpdesk_dashboard?tab=assigned">My Assigned Requests</a>
+                    <a href="/helpdesk_dashboard?tab=profile">Profile</a>
+                </div>
+                <div class="user-menu">
+                    <img src="/static/images/user-default.jpg" alt="User Avatar">
+                    <span>{{ user_email }}</span>
+                    <div class="user-menu-dropdown">
+                        <a href="/helpdesk_dashboard?tab=profile"><i class="fas fa-user"></i> My Profile</a>
+                        <a href="/helpdesk_dashboard?tab=unassigned"><i class="fas fa-inbox"></i> Unassigned
+                            Requests</a>
+                        <a href="/helpdesk_dashboard?tab=assigned"><i class="fas fa-tasks"></i> My Requests</a>
+                        <a href="/logout" class="logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <div class="container">
+            <!-- Flash Messages -->
+            {% if get_flashed_messages() %}
+            <div class="flash-messages">
+                {% for message in get_flashed_messages() %}
+                <div class="flash-message flash-success">
+                    <i class="fas fa-check-circle"></i> {{ message }}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <div class="request-container">
+                <a href="/helpdesk_dashboard?tab={% if request.helpdesk_staff_email == 'helpdeskteam@nittybiz.com' %}unassigned{% elif request.request_status == 2 %}completed{% else %}assigned{% endif %}"
+                    class="back-link">
+                    <i class="fas fa-arrow-left"></i> Back to Dashboard
+                </a>
+
+                <h1 class="page-title">Request Details</h1>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Request #REQ-{{ request.request_id }}</h2>
+                        <span class="request-status 
+                            {% if request.helpdesk_staff_email == 'helpdeskteam@nittybiz.com' %}status-unassigned
+                            {% elif request.request_status == 2 %}status-completed
+                            {% else %}status-assigned{% endif %}">
+                            {% if request.helpdesk_staff_email == 'helpdeskteam@nittybiz.com' %}Unassigned
+                            {% elif request.request_status == 2 %}Completed
+                            {% else %}Assigned{% endif %}
+                        </span>
+                    </div>
+                    <div class="card-body">
+                        <div class="detail-row">
+                            <div class="detail-label">Sender:</div>
+                            <div class="detail-value">{{ request.sender_email }}</div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">Request Type:</div>
+                            <div class="detail-value">{{ request.request_type }}</div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">Status:</div>
+                            <div class="detail-value">
+                                <span class="request-status 
+                                    {% if request.helpdesk_staff_email == 'helpdeskteam@nittybiz.com' %}status-unassigned
+                                    {% elif request.request_status == 2 %}status-completed
+                                    {% else %}status-assigned{% endif %}">
+                                    {% if request.helpdesk_staff_email == 'helpdeskteam@nittybiz.com' %}Unassigned
+                                    {% elif request.request_status == 2 %}Completed
+                                    {% else %}Assigned{% endif %}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">Assigned To:</div>
+                            <div class="detail-value">
+                                {% if request.helpdesk_staff_email == 'helpdeskteam@nittybiz.com' %}
+                                Not assigned yet
+                                {% else %}
+                                {{ request.helpdesk_staff_email }}
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">Description:</div>
+                            <div class="detail-value">
+                                <div class="request-description">{{ request.request_desc }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action buttons based on status -->
+                <div class="action-buttons">
+                    <a href="/helpdesk_dashboard?tab={% if request.helpdesk_staff_email == 'helpdeskteam@nittybiz.com' %}unassigned{% elif request.request_status == 2 %}completed{% else %}assigned{% endif %}"
+                        class="btn btn-light">Back</a>
+
+                    {% if request.helpdesk_staff_email == 'helpdeskteam@nittybiz.com' %}
+                    <a href="/claim_request/{{ request.request_id }}" class="btn btn-primary">Claim Request</a>
+                    {% elif request.request_status == 1 %}
+                    {% if request.request_type == 'Add New Category' %}
+                    <a href="/complete_request/{{ request.request_id }}" class="btn btn-success">Process Request</a>
+                    {% else %}
+                    <a href="/complete_request/{{ request.request_id }}" class="btn btn-success">Mark as Completed</a>
+                    {% endif %}
+                    {% endif %}
+                </div>
+
+                <!-- Form for adding new category (shown only for assigned "Add New Category" requests) -->
+                {% if request.request_status == 1 and request.request_type == 'Add New Category' and
+                request.helpdesk_staff_email == user_email %}
+                <div class="form-container card">
+                    <div class="card-header">
+                        <h2>Add New Category</h2>
+                    </div>
+                    <div class="card-body">
+                        <form action="/complete_request/{{ request.request_id }}" method="POST">
+                            <div class="form-group">
+                                <label for="category_name">Category Name</label>
+                                <input type="text" id="category_name" name="category_name" class="form-control"
+                                    required>
+                            </div>
+                            <div class="form-group">
+                                <label for="parent_category">Parent Category (Optional)</label>
+                                <select id="parent_category" name="parent_category" class="form-control">
+                                    <option value="">No Parent Category</option>
+                                    {% for category in categories %}
+                                    <option value="{{ category.category_name }}">{{ category.category_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="action-buttons">
+                                <button type="submit" class="btn btn-success">Add Category & Complete Request</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 - NittanyBusiness Project - CMPSC431W</p>
+            <p>Date: Monday March 24th, 2025</p>
+        </div>
+    </footer>
+</body>
+
+</html>
