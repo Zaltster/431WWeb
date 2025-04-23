@@ -258,12 +258,6 @@ def signup():
     print(f"Showing signup form with preselected type: {user_type}")  # Debug print
     return render_template('signup.html', selected_type=user_type)
 
-@app.route('/forgot-password')
-def forgot_password():
-    # This would typically email a reset link
-    # For now, we'll just provide a placeholder page
-    return render_template('forgot_password.html')
-#=======================LandingPage=======================#
 
 #=======================Buyer=======================#
 @app.route('/buyer_dashboard')
