@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NittanyBusiness - Helpdesk Sign Up</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* --- CSS Variables --- */
+        :root {
+            --primary-color: #1e88e5;
+            --secondary-color: #0d47a1;
+            --accent-color: #64b5f6;
+            --text-color: #333;
+            --light-bg: #f5f5f5;
+            --card-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            --hover-transition: all 0.3s ease;
+            --error-color: #f44336;
+            --success-color: #4caf50;
+            --border-color: #ddd;
+        }
+
+        /* --- Global Resets & Base --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--light-bg);
+            color: var(--text-color);
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            width: 100%;
+        }
+
+        /* --- Header --- */
+        header {
+            background-color: white;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .logo span {
+            color: var(--secondary-color);
+        }
+
+        /* --- Main Form Section --- */
+        .signup-section {
+            padding: 40px 0;
+            flex-grow: 1;
+        }
+
+        .signup-container {
+            max-width: 600px; /* Narrower container for simpler form */
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: var(--card-shadow);
+            overflow: hidden;
+        }
+
+        .form-header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+
+        .form-header h1 {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+         .form-header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .form-body {
+            padding: 30px 40px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+         .form-group h3 {
+             margin-bottom: 15px;
+             padding-bottom: 5px;
+             border-bottom: 1px solid #eee;
+             color: var(--secondary-color);
+             font-size: 18px;
+         }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+            font-size: 15px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            font-size: 16px;
+            transition: var(--hover-transition);
+        }
+         select.form-control {
+             appearance: none;
+             background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23007CB2%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E');
+             background-repeat: no-repeat;
+             background-position: right .7em top 50%;
+             background-size: .65em auto;
+             padding-right: 2.5em;
+         }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(30, 136, 229, 0.2);
+        }
+
+        /* --- Button --- */
+        .btn {
+            padding: 12px 20px;
+            border-radius: 5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--hover-transition);
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            width: 100%;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        /* --- Error/Success Messages --- */
+         .message-area {
+             padding: 15px;
+             margin-bottom: 20px;
+             border-radius: 5px;
+             display: flex;
+             align-items: center;
+             gap: 10px;
+             font-weight: 500;
+         }
+         .message-area.error {
+             background-color: #ffebee;
+             color: var(--error-color);
+             border: 1px solid #ffcdd2;
+         }
+         .message-area.success {
+             background-color: #e8f5e9;
+             color: var(--success-color);
+             border: 1px solid #c8e6c9;
+         }
+        .error-message { /* Inline error for fields */
+            color: var(--error-color);
+            font-size: 13px;
+            margin-top: 4px;
+            display: none; /* Hidden by default */
+        }
+         .form-control.is-invalid { /* Style for invalid fields */
+             border-color: var(--error-color);
+         }
+         .form-control.is-invalid:focus {
+             box-shadow: 0 0 0 2px rgba(244, 67, 54, 0.2);
+         }
+
+        /* --- Signin Link --- */
+        .signin-link {
+            text-align: center;
+            margin-top: 25px;
+            font-size: 15px;
+        }
+
+        .signin-link a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .signin-link a:hover {
+            text-decoration: underline;
+        }
+
+        /* --- Footer --- */
+        footer {
+            background-color: var(--secondary-color);
+            color: #e0e0e0;
+            padding: 20px 0;
+            text-align: center;
+            margin-top: auto;
+            font-size: 14px;
+        }
+         footer p {
+             margin-bottom: 5px;
+         }
+
+        /* --- Responsive --- */
+        @media (max-width: 768px) {
+            .form-body {
+                padding: 20px;
+            }
+             .form-header {
+                 padding: 20px;
+             }
+             .form-header h1 {
+                 font-size: 24px;
+             }
+        }
+
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <nav class="navbar">
+                <a href="/" class="logo">Nittany<span>Business</span></a>
+            </nav>
+        </div>
+    </header>
+
+    <section class="signup-section">
+        <div class="container">
+            <div class="signup-container">
+                <div class="form-header">
+                    <h1>Helpdesk Staff Sign Up</h1>
+                    <p>Create your NittanyBusiness Helpdesk account</p>
+                </div>
+                <div class="form-body">
+                    {% if error %}
+                    <div class="message-area error">
+                        <i class="fas fa-exclamation-circle fa-fw"></i> {{ error }}
+                    </div>
+                    {% endif %}
+                    {% if success %}
+                    <div class="message-area success">
+                         <i class="fas fa-check-circle fa-fw"></i> {{ success }}
+                    </div>
+                    {% endif %}
+
+                    <form id="signup-form" action="/signup_helpdesk" method="post">
+                        <input type="hidden" name="user_type" value="helpdesk">
+
+                        <div class="form-group">
+                            <h3>Basic Information</h3>
+                            <label for="email">Email Address</label>
+                            <input type="email" id="email" name="email" class="form-control" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="password">Password</label>
+                            <input type="password" id="password" name="password" class="form-control" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="confirm_password">Confirm Password</label>
+                            <input type="password" id="confirm_password" name="confirm_password" class="form-control" required>
+                             <div class="error-message" id="password-error">Passwords do not match.</div>
+                        </div>
+
+                        <div class="form-group">
+                            <h3>Helpdesk Information</h3>
+                            <label for="position">Position</label>
+                            <select id="position" name="position" class="form-control" required>
+                                <option value="">Select Position</option>
+                                <option value="Support Representative">Support Representative</option>
+                                <option value="Technical Support">Technical Support</option>
+                                <option value="Customer Service Manager">Customer Service Manager</option>
+                                <option value="Account Support">Account Support</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Create Helpdesk Account</button>
+
+                        <div class="signin-link">
+                            <p>Already have an account? <a href="/login">Sign In</a></p>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 - NittanyBusiness Project - CMPSC431W</p>
+            <p>Date: Monday March 24th, 2025</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // --- Password Confirmation ---
+            const form = document.getElementById('signup-form');
+            const passwordInput = document.getElementById('password');
+            const confirmPasswordInput = document.getElementById('confirm_password');
+            const passwordError = document.getElementById('password-error');
+
+            form.addEventListener('submit', function (event) {
+                const password = passwordInput.value;
+                const confirmPassword = confirmPasswordInput.value;
+                let isValid = true;
+
+                // Check if passwords match
+                if (password !== confirmPassword) {
+                    passwordError.style.display = 'block'; // Show error
+                    confirmPasswordInput.classList.add('is-invalid'); // Add style
+                    confirmPasswordInput.focus();
+                    isValid = false; // Mark invalid
+                } else {
+                    passwordError.style.display = 'none'; // Hide error
+                    confirmPasswordInput.classList.remove('is-invalid'); // Remove style
+                }
+
+                // Prevent form submission if not valid
+                if (!isValid) {
+                    event.preventDefault();
+                }
+            });
+
+             // Real-time password match check
+             confirmPasswordInput.addEventListener('input', function() {
+                 if (passwordInput.value !== confirmPasswordInput.value) {
+                     passwordError.style.display = 'block';
+                     confirmPasswordInput.classList.add('is-invalid');
+                 } else {
+                     passwordError.style.display = 'none';
+                     confirmPasswordInput.classList.remove('is-invalid');
+                 }
+             });
+             passwordInput.addEventListener('input', function() {
+                 if (confirmPasswordInput.value && passwordInput.value !== confirmPasswordInput.value) {
+                     passwordError.style.display = 'block';
+                     confirmPasswordInput.classList.add('is-invalid');
+                 } else {
+                     passwordError.style.display = 'none';
+                     confirmPasswordInput.classList.remove('is-invalid');
+                 }
+             });
+        });
+    </script>
+</body>
+
+</html>
