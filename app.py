@@ -605,6 +605,14 @@ def update_profile():
         state = request.form.get('state', '')
         zipcode = request.form.get('zipcode', '')
         
+        # Handle street and street name combined
+        if not street_num and not street_name and 'street' in request.form:
+            street_parts = request.form.get('street', '').split(' ', 1)
+            if len(street_parts) > 0:
+                street_num = street_parts[0]
+            if len(street_parts) > 1:
+                street_name = street_parts[1]
+        
         # Password change
         current_password = request.form.get('current_password', '')
         new_password = request.form.get('new_password', '')
