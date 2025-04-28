@@ -54,10 +54,13 @@ The application uses several interconnected tables:
    ```
    pip install Flask
    ```
-2. Run the development server (run app.py): 
+2. Run the development server and run app.py ( you can click the run button): 
    ```
-   flask run
+   example: /usr/bin/python3 /home/samshv/431final/431WWeb/app.py
    ```
+3. SQLite pre-populated the database so do not worry about that!
+
+
 
 ## Usage
 
