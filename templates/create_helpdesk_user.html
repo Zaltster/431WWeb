@@ -7,7 +7,6 @@
     <title>NittanyBusiness - Create Helpdesk User</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* Basic styles adapted from your other templates */
         :root {
             --primary-color: #1e88e5;
             --secondary-color: #0d47a1;
@@ -154,7 +153,6 @@
             box-shadow: 0 0 0 3px rgba(30, 136, 229, 0.2);
         }
 
-        /* Enhanced focus */
         select.form-control {
             appearance: none;
             background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
@@ -163,7 +161,6 @@
             background-size: 16px 12px;
         }
 
-        /* Custom dropdown arrow */
 
         .btn {
             padding: 12px 25px;
@@ -366,7 +363,6 @@
 
 
     <script>
-        // Optional: Client-side password match validation
         const form = document.getElementById('create-helpdesk-form');
         const passwordInput = document.getElementById('password');
         const confirmPasswordInput = document.getElementById('confirm_password');
@@ -385,11 +381,10 @@
         // Also check on form submit as a fallback
         form.addEventListener('submit', function (event) {
             if (passwordInput.value !== confirmPasswordInput.value) {
-                event.preventDefault(); // Stop form submission
-                // Ensure the validation message is shown
+                event.preventDefault(); 
                 confirmPasswordInput.setCustomValidity("Passwords do not match.");
-                alert('Passwords do not match!'); // Also alert for immediate feedback
-                confirmPasswordInput.reportValidity(); // Trigger browser's validation UI
+                alert('Passwords do not match!'); 
+                confirmPasswordInput.reportValidity(); 
             }
         });
     </script>
