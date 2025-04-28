@@ -6,9 +6,9 @@ import re
 
 # Initialize Flask application
 app = Flask(__name__)
-app.secret_key = 'nittany_business_secret_key'  # Change in production
+app.secret_key = 'nittany_business_secret_key'  
 app.config['DATABASE'] = 'database.db'
-app.config['PERMANENT_SESSION_LIFETIME'] = 1800  # 30 minutes
+app.config['PERMANENT_SESSION_LIFETIME'] = 1800  #<- around 30 minutes
 
 #=======================Helper=======================#
 def get_db_connection():
@@ -19,7 +19,7 @@ def get_db_connection():
 
 #=======================LandingPage=======================#
 @app.route('/')
-def index():
+def index(): #<- homepage/landing page 
     return render_template('index.html')
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -29,44 +29,42 @@ def login():
         email = request.form['email']
         password = request.form['password']
         remember = 'remember' in request.form
-        print(f"Login attempt for email: {email}")  # Debug print
-        # Validate user credentials
+        print(f"Login attempt for email: {email}") 
+        # validate user credentials
         conn = get_db_connection()
         user = conn.execute(
             'SELECT * FROM Users WHERE email = ?', (email,)).fetchone()
-        # Debug prints
         if user:
             print(f"User found in database: {user['email']}")
-            # Show first part of hash
+            # show first part of hash
             print(f"Password hash in DB: {user['password'][:20]}...")
         else:
             print(f"No user found with email: {email}")
         conn.close()
         if user is None:
             error = "Invalid email address."
-            print(f"Login failed: {error}")  # Debug print
+            print(f"Login failed: {error}")  
             return render_template('login.html', error=error)
-        # Calculate SHA-256 hash of the provided password for comparison
+        # calculate SHA-256 hash of the provided password for comparison
         provided_hash = hashlib.sha256(password.encode('utf-8')).hexdigest()
         stored_hash = user['password']
         print(f"Comparing hashes:")
         print(f"Stored:   {stored_hash[:20]}...")
         print(f"Provided: {provided_hash[:20]}...")
-        # Verify the password using direct comparison of SHA-256 hashes
+        # verify the password using direct comparison of SHA-256 hashes
         if provided_hash != stored_hash:
             error = "Invalid password."
-            print(f"Login failed: {error}")  # Debug print
+            print(f"Login failed: {error}")  
             return render_template('login.html', error=error)
-        # Login successful - store user info in session
-        print(f"Login successful for {email}")  # Debug print
+        print(f"Login successful for {email}")  
         session['user_email'] = user['email']
         
-        # Set a longer session lifetime if "remember me" is checked
+        # set a longer session lifetime if "remember me" is checked
         if remember:
             session.permanent = True
             
-        # Determine user type based on database records
-        conn = get_db_connection()  # Get a fresh connection
+        # determine user type based on database records
+        conn = get_db_connection()  # get a fresh connection
         buyer = conn.execute('SELECT * FROM Buyer WHERE email = ?', (email,)).fetchone()
         seller = conn.execute('SELECT * FROM Sellers WHERE email = ?', (email,)).fetchone()
         helpdesk = conn.execute('SELECT * FROM Helpdesk WHERE email = ?', (email,)).fetchone()
@@ -87,45 +85,45 @@ def login():
         else:
             return render_template('login.html', error=error)
     
-    # If it's a GET request or form submission failed validation
+    #throw error if get or form submission fails 
     return render_template('login.html', error=error)
 
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
-    print("Signup route accessed")  # Debug print
+    print("Signup route accessed")  
     
     if request.method == 'POST':
         try:
-            print("Processing signup POST request")  # Debug print
-            print(f"Form data: {request.form}")  # Debug print
+            print("Processing signup POST request")  
+            print(f"Form data: {request.form}")  
             
-            # Extract form data
+            #extract form data
             email = request.form['email']
             password = request.form['password']
             user_type = request.form['user_type']
             
-            print(f"Signup attempt - Email: {email}, Type: {user_type}")  # Debug print
+            print(f"Signup attempt - Email: {email}, Type: {user_type}")  
             
-            # Check if email already exists
+            #check if email already exists
             conn = get_db_connection()
             existing_user = conn.execute('SELECT * FROM Users WHERE email = ?', (email,)).fetchone()
             
             if existing_user:
-                print(f"Email {email} already exists in database")  # Debug print
+                print(f"Email {email} already exists in database")  
                 conn.close()
                 error = "Email already registered. Please use a different email or login."
                 return render_template('signup.html', error=error)
             
-            # Hash the password using SHA-256 (for consistency with existing code)
+            #hash the password using SHA-256 (for consistency with existing code)
             password_hash = hashlib.sha256(password.encode('utf-8')).hexdigest()
-            print(f"Password hashed: {password_hash[:20]}...")  # Debug print - only show part of hash
+            print(f"Password hashed: {password_hash[:20]}...")   #<- only show part of hash
             
-            # Insert the new user
+            # insert the new user
             cursor = conn.cursor()
             cursor.execute('INSERT INTO Users (email, password) VALUES (?, ?)', (email, password_hash))
-            print(f"User added to Users table: {email}")  # Debug print
+            print(f"User added to Users table: {email}")  
             
-            # Handle user-specific data based on type
+            # handle user-specific data based on type
             if user_type == 'buyer':
                 business_name = request.form.get('business_name', '')
                 
@@ -141,28 +139,28 @@ def signup():
                     if not zip_exists:
                         city = request.form.get('city', '')
                         state = request.form.get('state', '')
-                        print(f"Adding new zipcode: {zipcode}, {city}, {state}")  # Debug print
+                        print(f"Adding new zipcode: {zipcode}, {city}, {state}")  
                         cursor.execute('INSERT INTO Zipcode_Info (zipcode, city, state) VALUES (?, ?, ?)', 
                                     (zipcode, city, state))
                 
                 # Create address record
                 if street_num and street_name and zipcode:
-                    print(f"Creating address record: {street_num} {street_name}, {zipcode}")  # Debug print
+                    print(f"Creating address record: {street_num} {street_name}, {zipcode}")  
                     cursor.execute('''
                         INSERT INTO Address (zipcode, street_num, street_name) 
                         VALUES (?, ?, ?)
                     ''', (zipcode, street_num, street_name))
                     address_id = cursor.lastrowid
-                    print(f"Created address with ID: {address_id}")  # Debug print
+                    print(f"Created address with ID: {address_id}")  
                 
                 # Create buyer record
-                print(f"Creating buyer record: {email}, {business_name}, {address_id}")  # Debug print
+                print(f"Creating buyer record: {email}, {business_name}, {address_id}")  
                 cursor.execute('''
                     INSERT INTO Buyer (email, business_name, buyer_address_id) 
                     VALUES (?, ?, ?)
                 ''', (email, business_name, address_id))
                 
-                # Handle credit card info if provided
+                # Handle credit card info 
                 card_num = request.form.get('credit_card_num', '')
                 if card_num:
                     card_type = request.form.get('card_type', '')
@@ -170,7 +168,7 @@ def signup():
                     expire_year = request.form.get('expire_year', '')
                     security_code = request.form.get('security_code', '')
                     
-                    print(f"Adding credit card for {email}")  # Debug print
+                    print(f"Adding credit card for {email}")  
                     cursor.execute('''
                         INSERT INTO Credit_Cards (credit_card_num, card_type, expire_month, 
                         expire_year, security_code, Owner_email) 
@@ -192,26 +190,26 @@ def signup():
                     if not zip_exists:
                         city = request.form.get('seller_city', '')
                         state = request.form.get('seller_state', '')
-                        print(f"Adding new zipcode: {zipcode}, {city}, {state}")  # Debug print
+                        print(f"Adding new zipcode: {zipcode}, {city}, {state}")  
                         cursor.execute('INSERT INTO Zipcode_Info (zipcode, city, state) VALUES (?, ?, ?)', 
                                     (zipcode, city, state))
                 
                 # Create address record
                 if street_num and street_name and zipcode:
-                    print(f"Creating address record: {street_num} {street_name}, {zipcode}")  # Debug print
+                    print(f"Creating address record: {street_num} {street_name}, {zipcode}")  
                     cursor.execute('''
                         INSERT INTO Address (zipcode, street_num, street_name) 
                         VALUES (?, ?, ?)
                     ''', (zipcode, street_num, street_name))
                     address_id = cursor.lastrowid
-                    print(f"Created address with ID: {address_id}")  # Debug print
+                    print(f"Created address with ID: {address_id}")  
                 
                 # Get banking info
                 bank_routing_number = request.form.get('bank_routing_number', '')
                 bank_account_number = request.form.get('bank_account_number', '')
                 
                 # Create seller record with initial balance of 0
-                print(f"Creating seller record: {email}, {business_name}, {address_id}")  # Debug print
+                print(f"Creating seller record: {email}, {business_name}, {address_id}")  
                 cursor.execute('''
                     INSERT INTO Sellers (email, business_name, business_address_id, 
                     bank_routing_number, bank_account_number, balance) 
@@ -222,20 +220,20 @@ def signup():
                 position = request.form.get('position', 'Support Staff')
                 
                 # Create helpdesk record
-                print(f"Creating helpdesk record: {email}, {position}")  # Debug print
+                print(f"Creating helpdesk record: {email}, {position}")  
                 cursor.execute('INSERT INTO Helpdesk (email, position) VALUES (?, ?)', 
                              (email, position))
             
             # Commit the transaction
             conn.commit()
-            print(f"Successfully created account for {email} as {user_type}")  # Debug print
+            print(f"Successfully created account for {email} as {user_type}")  
             conn.close()
             
             # Set session data
             session['user_email'] = email
             session['user_type'] = user_type
             
-            print(f"Setting session for {email} as {user_type}")  # Debug print
+            print(f"Setting session for {email} as {user_type}")  
             
             # Redirect to appropriate dashboard
             if user_type == 'buyer':
@@ -246,16 +244,15 @@ def signup():
                 return redirect(url_for('helpdesk_dashboard'))
                 
         except Exception as e:
-            print(f"Error during signup: {str(e)}")  # Debug print
+            print(f"Error during signup: {str(e)}")  
             conn.rollback()
             conn.close()
             error = f"An error occurred during signup: {str(e)}"
             return render_template('signup.html', error=error)
     
-    # For GET request, show the signup form
     # If a user type was specified in the query string, pre-select that option
     user_type = request.args.get('type', 'buyer')
-    print(f"Showing signup form with preselected type: {user_type}")  # Debug print
+    print(f"Showing signup form with preselected type: {user_type}")  
     return render_template('signup.html', selected_type=user_type)
 
 
@@ -364,17 +361,16 @@ def buyer_dashboard():
 
 @app.route('/product/<int:listing_id>')
 def product_detail(listing_id):
-    # Check if user is logged in
     if 'user_email' not in session:
         flash('Please log in to view product details.', 'warning')
         return redirect(url_for('login'))
 
-    conn = None # Initialize conn to None
+    conn = None 
     try:
-        conn = get_db_connection() # Establish database connection
+        conn = get_db_connection() 
 
-        # --- Get Product Details ---
-        # Fetch product information along with seller details using a JOIN
+        # Get Product Details
+        # use join to get  product information along with seller details 
         product = conn.execute(
             '''SELECT pl.*, s.business_name AS seller_name, s.email AS seller_email
                FROM Product_Listings pl
@@ -383,25 +379,23 @@ def product_detail(listing_id):
             (listing_id,)
         ).fetchone()
 
-        # Handle case where product is not found
+        # if product is not found
         if not product:
             flash('Product not found.', 'danger')
             return redirect(url_for('buyer_dashboard'))
 
-        # --- Get Product Reviews ---
+        # Get Product Reviews 
         # Fetch reviews associated with the product, joining with Orders to get buyer email and order date
         reviews = conn.execute(
             '''SELECT r.*, o.Buyer_Email, o.Date
                FROM Reviews r
                JOIN Orders o ON r.Order_ID = o.Order_ID
                WHERE o.Listing_ID = ?
-               ORDER BY o.Date DESC''', # Order reviews by date, newest first
+               ORDER BY o.Date DESC''', #<- Order reviews by date, newest first
             (listing_id,)
         ).fetchall()
 
-        # --- Calculate Average Rating and Review Count ---
-        # Use SQL AVG() and COUNT() for efficiency. Fetch a single row with the results.
-        # Use COALESCE to handle cases with no reviews (AVG returns NULL), defaulting to 0.0
+        # Calculate Average Rating and Review Count
         rating_data = conn.execute(
             '''SELECT COALESCE(AVG(r.Rating), 0.0) AS average, COUNT(r.Rating) AS count
                FROM Reviews r
@@ -411,16 +405,13 @@ def product_detail(listing_id):
         ).fetchone()
 
     except Exception as e:
-        # Basic error handling for database operations
         flash(f'An error occurred: {e}', 'danger')
-        # Redirect to a safe page, like the dashboard
+        # Redirect to the dashboard
         return redirect(url_for('buyer_dashboard'))
     finally:
-        # Ensure the database connection is always closed
         if conn:
             conn.close()
 
-    # Render the template, passing all necessary data
     return render_template(
         'product_detail.html',
         user_email=session['user_email'],
@@ -443,10 +434,8 @@ def product_search():
     max_price = request.args.get('max_price', '')
     sort_by = request.args.get('sort_by', 'relevance')
     
-    # Debug output
     print(f"Search parameters: query='{query}', category='{category}', min_price='{min_price}', max_price='{max_price}', sort_by='{sort_by}'")
     
-    # Build search SQL query
     conn = get_db_connection()
     sql_query = '''
         SELECT pl.*, s.business_name AS seller_name,
@@ -511,11 +500,9 @@ def product_search():
             # If no query, order by rating
             sql_query += ' ORDER BY avg_rating DESC NULLS LAST, review_count DESC'
     
-    # Print the SQL query for debugging
     print("SQL Query:", sql_query)
     print("Params:", params)
     
-    # Execute query
     try:
         products = conn.execute(sql_query, params).fetchall()
         print(f"Found {len(products)} products.")
@@ -832,8 +819,7 @@ def add_payment():
         
         flash('Payment method added successfully!')
         return redirect(url_for('buyer_dashboard', tab='profile'))
-    
-    # GET request - show form
+
     return render_template('add_payment.html', user_email=session['user_email'], user_type=session['user_type'])
 
 @app.route('/payment/<card_num>/edit', methods=['GET', 'POST'])
@@ -881,7 +867,6 @@ def edit_payment(card_num):
         flash('Payment method updated successfully!')
         return redirect(url_for('buyer_dashboard', tab='profile'))
     
-    # GET request - show form
     conn.close()
     return render_template('edit_payment.html', card=card, user_email=session['user_email'], user_type=session['user_type'])
 
@@ -1022,7 +1007,6 @@ def checkout(listing_id):
         # Always redirect back to buyer dashboard
         return redirect(url_for('buyer_dashboard', tab='orders'))
     
-    # GET request - show checkout form
     conn.close()
     return render_template(
         'checkout.html',
@@ -1175,7 +1159,7 @@ def add_product():
     status = request.form.get('status')
     
     # For Product_Name, we can use the same value as Product_Title if no separate field exists
-    product_name = product_title  # Use the same value as title if no separate field
+    product_name = product_title  
     
     # Validate inputs
     if not product_title or not product_description or not category or not product_price or not quantity or status is None:
@@ -1638,8 +1622,7 @@ def complete_request(request_id):
             request=helpdesk_request,
             categories=categories
         )
-    
-    # For other request types (not implemented in this phase)
+
     conn.execute(
         'UPDATE Requests SET request_status = 2 WHERE request_id = ?',
         (request_id,)
@@ -1689,12 +1672,12 @@ def submit_request():
 
 @app.route('/create_helpdesk_user', methods=['GET', 'POST'])
 def create_helpdesk_user():
-    # --- Authorization Check ---
+    # Authorization Check 
     if 'user_email' not in session or session.get('user_type') != 'helpdesk':
         flash("You are not authorized to access this page.", "error")
         return redirect(url_for('login')) # Or redirect to their own dashboard
 
-    error = None # Initialize error variable
+    error = None 
 
     if request.method == 'POST':
         email = request.form.get('email')
@@ -1702,12 +1685,11 @@ def create_helpdesk_user():
         password = request.form.get('password')
         confirm_password = request.form.get('confirm_password')
 
-        # --- Basic Validation ---
+        # Basic Validation
         if not email or not position or not password or not confirm_password:
             error = "All fields are required."
         elif password != confirm_password:
             error = "Passwords do not match."
-        # Optional: Add more robust email validation if needed
         elif not re.match(r"[^@]+@[^@]+\.[^@]+", email):
              error = "Invalid email format."
 
@@ -1715,7 +1697,7 @@ def create_helpdesk_user():
             # Re-render the form with the error message
             return render_template('create_helpdesk_user.html', error=error, user_email=session['user_email'], user_type=session['user_type'])
 
-        conn = None # Initialize conn
+        conn = None 
         try:
             conn = get_db_connection()
             cursor = conn.cursor()
@@ -1744,21 +1726,19 @@ def create_helpdesk_user():
             if conn:
                 conn.rollback() # Rollback changes on error
             error = f"Database error: {e}"
-            print(f"Database error creating helpdesk user: {e}") # Log the error
+            print(f"Database error creating helpdesk user: {e}") 
             return render_template('create_helpdesk_user.html', error=error, user_email=session['user_email'], user_type=session['user_type'])
         except Exception as e:
             # Catch any other unexpected errors
              if conn:
                 conn.rollback()
              error = f"An unexpected error occurred: {e}"
-             print(f"Unexpected error creating helpdesk user: {e}") # Log the error
+             print(f"Unexpected error creating helpdesk user: {e}")
              return render_template('create_helpdesk_user.html', error=error, user_email=session['user_email'], user_type=session['user_type'])
         finally:
             if conn:
                 conn.close()
 
-    # --- GET Request ---
-    # Pass current user info for the template's header/footer if needed
     return render_template('create_helpdesk_user.html', user_email=session['user_email'], user_type=session['user_type'])
 #=======================HelpDesk========================#
 
@@ -1768,7 +1748,7 @@ def create_helpdesk_user():
 def logout():
     session.clear()
     return redirect(url_for('index'))
-
+#=======================AllThree========================#
 
 if __name__ == '__main__':
     app.run(debug=True)
