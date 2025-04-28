@@ -691,22 +691,67 @@ def update_profile():
         flash('Profile updated successfully!')
         return redirect(url_for('buyer_dashboard', tab='profile'))
     
-    # Similar logic for other user types
-    elif user_type == 'seller':
-        # Handle seller profile update
-        conn = get_db_connection()
-        flash('Seller profile update functionality will be implemented soon.')
-        conn.close()
-        return redirect(url_for('seller_dashboard'))
     
-    elif user_type == 'helpdesk':
-        # Handle helpdesk profile update
-        conn = get_db_connection()
-        flash('Helpdesk profile update functionality will be implemented soon.')
-        conn.close()
-        return redirect(url_for('helpdesk_dashboard'))
     
     return redirect(url_for('dashboard'))
+
+@app.route('/update_helpdesk_profile', methods=['POST'])
+def update_helpdesk_profile():
+    if 'user_email' not in session or session['user_type'] != 'helpdesk':
+        return redirect(url_for('login'))
+    
+    user_email = session['user_email']
+    
+    # Get form data
+    position = request.form.get('position', '')
+    
+    # Password change
+    current_password = request.form.get('current_password', '')
+    new_password = request.form.get('new_password', '')
+    confirm_password = request.form.get('confirm_password', '')
+    
+    conn = get_db_connection()
+    
+    # Update position
+    if position:
+        conn.execute(
+            'UPDATE Helpdesk SET position = ? WHERE email = ?',
+            (position, user_email)
+        )
+        flash('Profile information updated successfully!')
+    
+    # Handle password change
+    if current_password and new_password and confirm_password:
+        if new_password != confirm_password:
+            conn.close()
+            flash('New passwords do not match!')
+            return redirect(url_for('helpdesk_dashboard', tab='profile'))
+        
+        # Verify current password
+        user = conn.execute(
+            'SELECT * FROM Users WHERE email = ?', 
+            (user_email,)
+        ).fetchone()
+        
+        current_hash = hashlib.sha256(current_password.encode('utf-8')).hexdigest()
+        
+        if user and user['password'] == current_hash:
+            # Update password
+            new_hash = hashlib.sha256(new_password.encode('utf-8')).hexdigest()
+            conn.execute(
+                'UPDATE Users SET password = ? WHERE email = ?',
+                (new_hash, user_email)
+            )
+            flash('Password updated successfully!')
+        else:
+            conn.close()
+            flash('Current password is incorrect!')
+            return redirect(url_for('helpdesk_dashboard', tab='profile'))
+    
+    conn.commit()
+    conn.close()
+    
+    return redirect(url_for('helpdesk_dashboard', tab='profile'))
 
 @app.route('/order/<int:order_id>')
 def view_order(order_id):
