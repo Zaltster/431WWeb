@@ -1,120 +1,112 @@
-# NittanyBusiness Project - Phase 2 Progress Review
+# NittanyBusiness E-commerce Platform
 
-## Project Overview
-
-This is a Flask-based web application for the NittanyBusiness system, focusing on the User Login functionality for the Phase 2 Progress Review. The system implements secure user authentication with password hashing to meet the project requirements.
+## Overview
+NittanyBusiness is a comprehensive e-commerce web application built with Python Flask and SQLite. The platform connects buyers and sellers, allowing product listings, purchases, and reviews, all managed by a helpdesk support system. Built by 2D2S
 
 ## Features
 
-- User authentication system with secure password hashing using SHA-256
-- Role-based access control (Buyer, Seller, Helpdesk)
-- Session management for authenticated users
-- Error handling for invalid login attempts
-- Comprehensive database schema for business operations
+### User System
+- Multiple user types: Buyers, Sellers, and Helpdesk staff
+- Secure authentication with password hashing
+- Profile management for all user types
 
-## Project Structure
+### Buyer Features
+- Browse product listings by category
+- Search functionality with filters
+- Purchase products
+- View order history
+- Leave product reviews
+- Manage payment methods
 
-```
-431WWeb/
-├── templates/              # HTML templates directory
-│   ├── dashboard.html      # Dashboard page after successful login
-│   ├── index.html          # Home/landing page
-│   └── login.html          # Login page with error handling
-├── app.py                  # Main Flask application
-├── schema.sql              # Database schema definition
-├── database.db             # SQLite database
-├── Users.csv               # User data for import
-├── Helpdesk.csv            # Helpdesk staff data
-├── Sellers.csv             # Sellers data
-├── Buyers.csv              # Buyers data
-├── Orders.csv              # Orders data
-├── Reviews.csv             # Reviews data
-├── Product_Listings.csv    # Product listings data
-├── Categories.csv          # Categories data
-├── Address.csv             # Address data
-├── Zipcode_Info.csv        # Zipcode information
-├── Credit_Cards.csv        # Credit card data
-└── Requests.csv            # Support requests data
-```
+### Seller Features
+- Create and manage product listings
+- Process orders
+- Track sales performance and revenue
+- View buyer details for completed orders
 
-## Technology Stack
+### Helpdesk Features
+- Process support requests from buyers and sellers
+- Manage system categories
+- Create additional helpdesk accounts
 
-- **Backend**: Python, Flask
-- **Database**: SQLite
-- **Authentication**: SHA-256 password hashing
-- **Frontend**: HTML
+## Technical Details
 
-## Setup Instructions
+### Technology Stack
+- **Backend**: Python Flask
+- **Database**: SQLite3
+- **Frontend**: HTML (jinjia), CSS, JavaScript
 
-### Prerequisites
+### Database Schema
+The application uses several interconnected tables:
+- Users: Core user information
+- Buyers/Sellers/Helpdesk: User type-specific details
+- Product_Listings: Products available for purchase
+- Orders: Transaction records
+- Reviews: Customer feedback
+- Address: Location information
+- Zipcode_Info: City/state data for zipcodes
+- Credit_Cards: Payment methods for buyers
+- Requests: Support tickets
 
-- Python 3.6 or higher
-- Flask
-- SQLite3
+## Installation
 
-### Installation
-
-1. Clone the repository or extract the project files to your desired location.
-
-2. Create a virtual environment (optional but recommended):
-
-   ```bash
-   python -m venv venv
+1. Clone the repository/download zip
    ```
-
-3. Activate the virtual environment:
-
-   - Windows: `venv\Scripts\activate`
-   - macOS/Linux: `source venv/bin/activate`
-
-4. Install required packages:
-   ```bash
-   pip install flask werkzeug
+   pip install Flask
    ```
-
-### Database Setup
-
-Several scripts are provided to populate the database from CSV files:
-
-1. Initialize the database and import users:
-
-   ```bash
-   python import_users.py
+2. Run the development server (run app.py): 
    ```
-
-2. Import other data as needed:
-   ```bash
-   python populate_address.py
-   python populate_requests.py
-   # Additional import scripts...
+   flask run
    ```
-
-### Running the Application
-
-1. Start the Flask application:
-
-   ```bash
-   python app.py
-   ```
-
-2. Open your web browser and navigate to `http://127.0.0.1:5000/`
-
-3. Use the login page to authenticate with credentials from the Users.csv file.
 
 ## Usage
 
-1. From the home page, click "Go to Login Page"
-2. Enter a valid email and password from the Users.csv file
-3. Upon successful authentication, you'll be redirected to a dashboard based on your user type (Buyer, Seller, or Helpdesk)
-4. Use the logout link to end your session
+### For Buyers
+1. Create a buyer account
+2. Browse or search for products
+3. Purchase items
+4. Leave reviews on completed orders
+5. Manage your profile and payment methods
 
-## Security Features
+### For Sellers
+1. Create a seller account
+2. Add product listings with descriptions and pricing
+3. Manage inventory
+4. Process incoming orders
+5. View sales statistics
 
-- Passwords are hashed using SHA-256 before storage
-- Passwords are not visible during entry (type="password")
-- Session-based authentication
-- Error messages do not reveal sensitive information
+### For Helpdesk
+1. Log in with helpdesk credentials
+2. Process support requests
+3. Manage product categories
+4. Create additional helpdesk accounts as needed
 
-## Project Authors
+## Project Structure
+```
+NittanyBusiness/
+├── app.py               # Main application file
+├── database.db          # SQLite database
+├── static/              # Static assets (CSS, JS, images)
+├── templates/           # HTML templates
+│   ├── add_category.html
+│   ├── add_payment.html
+│   ├── buyer_dashboard.html
+│   ├── checkout.html
+│   ├── helpdesk_dashboard.html
+│   ├── index.html
+│   ├── login.html
+│   ├── order_detail.html
+│   ├── product_detail.html
+│   ├── search_results.html
+│   ├── seller_dashboard.html
+│   ├── signup.html
+│   └── view_request.html
+└── requirements.txt     # Python dependencies
+```
 
-- 2D2S, The greats
+
+
+### Database Connection Handling
+Always ensure that database connections are properly closed after operations by using the `conn.close()` method or by implementing connections within a context manager.
+
+
