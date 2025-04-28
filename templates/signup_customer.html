@@ -18,7 +18,8 @@
             --hover-transition: all 0.3s ease;
             --error-color: #f44336;
             --success-color: #4caf50;
-            --border-color: #ddd; /* Added for consistency */
+            --border-color: #ddd;
+            /* Added for consistency */
         }
 
         /* --- Global Resets & Base --- */
@@ -74,8 +75,10 @@
 
         /* --- Main Form Section --- */
         .signup-section {
-            padding: 40px 0; /* Reduced padding */
-            flex-grow: 1; /* Allow section to grow */
+            padding: 40px 0;
+            /* Reduced padding */
+            flex-grow: 1;
+            /* Allow section to grow */
         }
 
         .signup-container {
@@ -90,65 +93,79 @@
         .form-header {
             background-color: var(--primary-color);
             color: white;
-            padding: 25px; /* Reduced padding */
+            padding: 25px;
+            /* Reduced padding */
             text-align: center;
         }
 
         .form-header h1 {
-            font-size: 28px; /* Adjusted size */
+            font-size: 28px;
+            /* Adjusted size */
             margin-bottom: 8px;
         }
-         .form-header p {
+
+        .form-header p {
             font-size: 16px;
             opacity: 0.9;
         }
 
         .form-body {
-            padding: 30px 40px; /* Adjusted padding */
+            padding: 30px 40px;
+            /* Adjusted padding */
         }
 
         .form-group {
-            margin-bottom: 20px; /* Reduced margin */
+            margin-bottom: 20px;
+            /* Reduced margin */
         }
-         .form-group h3, .form-group h4 {
-             margin-bottom: 15px;
-             padding-bottom: 5px;
-             border-bottom: 1px solid #eee;
-             color: var(--secondary-color);
-             font-size: 18px;
-         }
-         .form-group h4 {
-             font-size: 16px;
-             margin-top: 20px;
-             color: var(--primary-color);
-             border-bottom: none;
-             padding-bottom: 0;
-         }
+
+        .form-group h3,
+        .form-group h4 {
+            margin-bottom: 15px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #eee;
+            color: var(--secondary-color);
+            font-size: 18px;
+        }
+
+        .form-group h4 {
+            font-size: 16px;
+            margin-top: 20px;
+            color: var(--primary-color);
+            border-bottom: none;
+            padding-bottom: 0;
+        }
 
 
         .form-group label {
             display: block;
-            margin-bottom: 6px; /* Reduced margin */
+            margin-bottom: 6px;
+            /* Reduced margin */
             font-weight: 500;
-            font-size: 15px; /* Adjusted size */
+            font-size: 15px;
+            /* Adjusted size */
         }
 
         .form-control {
             width: 100%;
-            padding: 10px 12px; /* Adjusted padding */
+            padding: 10px 12px;
+            /* Adjusted padding */
             border: 1px solid var(--border-color);
             border-radius: 5px;
             font-size: 16px;
             transition: var(--hover-transition);
         }
-         select.form-control {
-             appearance: none; /* Better dropdown appearance */
-             background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23007CB2%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E');
-             background-repeat: no-repeat;
-             background-position: right .7em top 50%;
-             background-size: .65em auto;
-             padding-right: 2.5em; /* Space for arrow */
-         }
+
+        select.form-control {
+            appearance: none;
+            /* Better dropdown appearance */
+            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23007CB2%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E');
+            background-repeat: no-repeat;
+            background-position: right .7em top 50%;
+            background-size: .65em auto;
+            padding-right: 2.5em;
+            /* Space for arrow */
+        }
 
         .form-control:focus {
             outline: none;
@@ -160,7 +177,8 @@
         .user-type-selection {
             display: flex;
             gap: 15px;
-            margin-bottom: 25px; /* Reduced margin */
+            margin-bottom: 25px;
+            /* Reduced margin */
         }
 
         .user-type-option {
@@ -176,7 +194,8 @@
         }
 
         .user-type-option label {
-            display: flex; /* Use flex for alignment */
+            display: flex;
+            /* Use flex for alignment */
             flex-direction: column;
             align-items: center;
             justify-content: center;
@@ -187,7 +206,8 @@
             cursor: pointer;
             transition: var(--hover-transition);
             border: 2px solid transparent;
-            height: 100%; /* Make labels equal height */
+            height: 100%;
+            /* Make labels equal height */
             font-weight: 500;
         }
 
@@ -197,14 +217,18 @@
             color: var(--primary-color);
             box-shadow: 0 2px 4px rgba(30, 136, 229, 0.1);
         }
-         .user-type-option input[type="radio"]:focus + label {
-             border-color: var(--accent-color); /* Focus indicator */
-         }
+
+        .user-type-option input[type="radio"]:focus+label {
+            border-color: var(--accent-color);
+            /* Focus indicator */
+        }
 
 
         .user-type-option label i {
-            /* display: block; */ /* Removed, handled by flex */
-            font-size: 24px; /* Adjusted size */
+            /* display: block; */
+            /* Removed, handled by flex */
+            font-size: 24px;
+            /* Adjusted size */
             margin-bottom: 8px;
         }
 
@@ -212,7 +236,8 @@
         .btn {
             padding: 12px 20px;
             border-radius: 5px;
-            font-weight: 600; /* Bolder */
+            font-weight: 600;
+            /* Bolder */
             cursor: pointer;
             transition: var(--hover-transition);
             text-decoration: none;
@@ -226,19 +251,21 @@
             color: white;
             border: none;
             width: 100%;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         .btn-primary:hover {
             background-color: var(--secondary-color);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
         }
 
         /* --- Dynamic Fields Styling --- */
         .dynamic-fields {
-            margin-top: 25px; /* Reduced margin */
+            margin-top: 25px;
+            /* Reduced margin */
             border-top: 1px solid #eee;
-            padding-top: 25px; /* Reduced margin */
+            padding-top: 25px;
+            /* Reduced margin */
         }
 
         .form-row {
@@ -249,51 +276,66 @@
 
         .form-col {
             flex: 1;
-            min-width: 0; /* Prevent flex items from overflowing */
+            min-width: 0;
+            /* Prevent flex items from overflowing */
         }
-        .form-col.zip-col { /* Specific width for zip code */
+
+        .form-col.zip-col {
+            /* Specific width for zip code */
             flex: 0 1 120px;
         }
-         .form-col.cvv-col { /* Specific width for CVV */
+
+        .form-col.cvv-col {
+            /* Specific width for CVV */
             flex: 0 1 100px;
         }
-         .form-col.exp-col { /* Specific width for expiration */
+
+        .form-col.exp-col {
+            /* Specific width for expiration */
             flex: 0 1 120px;
         }
 
 
         /* --- Error/Success Messages --- */
-         .message-area {
-             padding: 15px;
-             margin-bottom: 20px;
-             border-radius: 5px;
-             display: flex;
-             align-items: center;
-             gap: 10px;
-             font-weight: 500;
-         }
-         .message-area.error {
-             background-color: #ffebee;
-             color: var(--error-color);
-             border: 1px solid #ffcdd2;
-         }
-         .message-area.success {
-             background-color: #e8f5e9;
-             color: var(--success-color);
-             border: 1px solid #c8e6c9;
-         }
-        .error-message { /* Inline error for fields */
+        .message-area {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 500;
+        }
+
+        .message-area.error {
+            background-color: #ffebee;
+            color: var(--error-color);
+            border: 1px solid #ffcdd2;
+        }
+
+        .message-area.success {
+            background-color: #e8f5e9;
+            color: var(--success-color);
+            border: 1px solid #c8e6c9;
+        }
+
+        .error-message {
+            /* Inline error for fields */
             color: var(--error-color);
             font-size: 13px;
             margin-top: 4px;
-            display: none; /* Hidden by default */
+            display: none;
+            /* Hidden by default */
         }
-         .form-control.is-invalid { /* Style for invalid fields */
-             border-color: var(--error-color);
-         }
-         .form-control.is-invalid:focus {
-             box-shadow: 0 0 0 2px rgba(244, 67, 54, 0.2);
-         }
+
+        .form-control.is-invalid {
+            /* Style for invalid fields */
+            border-color: var(--error-color);
+        }
+
+        .form-control.is-invalid:focus {
+            box-shadow: 0 0 0 2px rgba(244, 67, 54, 0.2);
+        }
 
 
         /* --- Signin Link --- */
@@ -323,25 +365,31 @@
         /* --- Footer --- */
         footer {
             background-color: var(--secondary-color);
-            color: #e0e0e0; /* Lighter text */
+            color: #e0e0e0;
+            /* Lighter text */
             padding: 20px 0;
             text-align: center;
-            margin-top: auto; /* Push footer to bottom */
+            margin-top: auto;
+            /* Push footer to bottom */
             font-size: 14px;
         }
-         footer p {
-             margin-bottom: 5px;
-         }
+
+        footer p {
+            margin-bottom: 5px;
+        }
 
         /* --- Responsive --- */
         @media (max-width: 768px) {
             .form-row {
                 flex-direction: column;
-                gap: 0; /* Remove gap, rely on form-group margin */
+                gap: 0;
+                /* Remove gap, rely on form-group margin */
             }
-             .form-col { /* Reset flex basis for stacking */
-                 flex: 1 1 auto;
-             }
+
+            .form-col {
+                /* Reset flex basis for stacking */
+                flex: 1 1 auto;
+            }
 
 
             .user-type-selection {
@@ -351,23 +399,26 @@
             .form-body {
                 padding: 20px;
             }
-             .form-header {
-                 padding: 20px;
-             }
-             .form-header h1 {
-                 font-size: 24px;
-             }
-        }
-        @media (max-width: 480px) {
-             .user-type-option label {
-                 padding: 12px;
-             }
-             .user-type-option label i {
-                 font-size: 20px;
-                 margin-bottom: 5px;
-             }
+
+            .form-header {
+                padding: 20px;
+            }
+
+            .form-header h1 {
+                font-size: 24px;
+            }
         }
 
+        @media (max-width: 480px) {
+            .user-type-option label {
+                padding: 12px;
+            }
+
+            .user-type-option label i {
+                font-size: 20px;
+                margin-bottom: 5px;
+            }
+        }
     </style>
 </head>
 
@@ -395,7 +446,7 @@
                     {% endif %}
                     {% if success %}
                     <div class="message-area success">
-                         <i class="fas fa-check-circle fa-fw"></i> {{ success }}
+                        <i class="fas fa-check-circle fa-fw"></i> {{ success }}
                     </div>
                     {% endif %}
 
@@ -404,14 +455,16 @@
                             <h3>Select Account Type</h3>
                             <div class="user-type-selection">
                                 <div class="user-type-option">
-                                    <input type="radio" id="buyer" name="user_type" value="buyer" required {% if selected_type=='buyer' %}checked{% endif %}>
+                                    <input type="radio" id="buyer" name="user_type" value="buyer" required {% if
+                                        selected_type=='buyer' %}checked{% endif %}>
                                     <label for="buyer">
                                         <i class="fas fa-shopping-cart"></i>
                                         Buyer
                                     </label>
                                 </div>
                                 <div class="user-type-option">
-                                    <input type="radio" id="seller" name="user_type" value="seller" required {% if selected_type=='seller' %}checked{% endif %}>
+                                    <input type="radio" id="seller" name="user_type" value="seller" required {% if
+                                        selected_type=='seller' %}checked{% endif %}>
                                     <label for="seller">
                                         <i class="fas fa-store"></i>
                                         Seller
@@ -433,7 +486,8 @@
 
                         <div class="form-group">
                             <label for="confirm_password">Confirm Password</label>
-                            <input type="password" id="confirm_password" name="confirm_password" class="form-control" required>
+                            <input type="password" id="confirm_password" name="confirm_password" class="form-control"
+                                required>
                             <div class="error-message" id="password-error">Passwords do not match.</div>
                         </div>
 
@@ -441,7 +495,8 @@
                             <div class="form-group">
                                 <h3>Buyer Information</h3>
                                 <label for="buyer_business_name">Business Name (Optional)</label>
-                                <input type="text" id="buyer_business_name" name="buyer_business_name" class="form-control">
+                                <input type="text" id="buyer_business_name" name="buyer_business_name"
+                                    class="form-control">
                             </div>
 
                             <div class="form-group">
@@ -449,30 +504,40 @@
                                 <div class="form-row">
                                     <div class="form-col">
                                         <label for="buyer_street_num">Street Number</label>
-                                        <input type="text" id="buyer_street_num" name="buyer_street_num" class="form-control">
+                                        <input type="text" id="buyer_street_num" name="buyer_street_num"
+                                            class="form-control">
                                     </div>
                                     <div class="form-col">
                                         <label for="buyer_street_name">Street Name</label>
-                                        <input type="text" id="buyer_street_name" name="buyer_street_name" class="form-control">
+                                        <input type="text" id="buyer_street_name" name="buyer_street_name"
+                                            class="form-control">
                                     </div>
                                 </div>
-                                <div class="form-row" style="margin-top: 15px;"> <div class="form-col">
+                                <div class="form-row" style="margin-top: 15px;">
+                                    <div class="form-col">
                                         <label for="buyer_city">City</label>
                                         <input type="text" id="buyer_city" name="buyer_city" class="form-control">
                                     </div>
                                     <div class="form-col">
                                         <label for="buyer_state">State</label>
-                                        <input type="text" id="buyer_state" name="buyer_state" class="form-control" maxlength="2"> </div>
+                                        <input type="text" id="buyer_state" name="buyer_state" class="form-control"
+                                            maxlength="2">
+                                    </div>
                                     <div class="form-col zip-col">
                                         <label for="buyer_zipcode">Zip Code</label>
-                                        <input type="text" id="buyer_zipcode" name="buyer_zipcode" class="form-control" inputmode="numeric" pattern="[0-9]{5}(?:-[0-9]{4})?"> </div>
+                                        <input type="text" id="buyer_zipcode" name="buyer_zipcode" class="form-control"
+                                            inputmode="numeric" pattern="[0-9]{5}(?:-[0-9]{4})?">
+                                    </div>
                                 </div>
                             </div>
 
                             <div class="form-group">
                                 <h4>Payment Information</h4>
                                 <label for="credit_card_num">Credit Card Number</label>
-                                <input type="text" id="credit_card_num" name="credit_card_num" class="form-control" inputmode="numeric" pattern="[0-9\s]{13,19}"> <div class="form-row" style="margin-top: 15px;"> <div class="form-col">
+                                <input type="text" id="credit_card_num" name="credit_card_num" class="form-control"
+                                    inputmode="numeric" pattern="[0-9\s]{13,19}">
+                                <div class="form-row" style="margin-top: 15px;">
+                                    <div class="form-col">
                                         <label for="card_type">Card Type</label>
                                         <select id="card_type" name="card_type" class="form-control">
                                             <option value="">Select Type</option>
@@ -486,25 +551,42 @@
                                         <label for="expire_month">Exp. Month</label>
                                         <select id="expire_month" name="expire_month" class="form-control">
                                             <option value="">MM</option>
-                                            <option value="01">01</option> <option value="02">02</option> <option value="03">03</option>
-                                            <option value="04">04</option> <option value="05">05</option> <option value="06">06</option>
-                                            <option value="07">07</option> <option value="08">08</option> <option value="09">09</option>
-                                            <option value="10">10</option> <option value="11">11</option> <option value="12">12</option>
+                                            <option value="01">01</option>
+                                            <option value="02">02</option>
+                                            <option value="03">03</option>
+                                            <option value="04">04</option>
+                                            <option value="05">05</option>
+                                            <option value="06">06</option>
+                                            <option value="07">07</option>
+                                            <option value="08">08</option>
+                                            <option value="09">09</option>
+                                            <option value="10">10</option>
+                                            <option value="11">11</option>
+                                            <option value="12">12</option>
                                         </select>
                                     </div>
                                     <div class="form-col exp-col">
                                         <label for="expire_year">Exp. Year</label>
                                         <select id="expire_year" name="expire_year" class="form-control">
                                             <option value="">YYYY</option>
-                                            <option value="2025">2025</option> <option value="2026">2026</option> <option value="2027">2027</option>
-                                            <option value="2028">2028</option> <option value="2029">2029</option> <option value="2030">2030</option>
-                                            <option value="2031">2031</option> <option value="2032">2032</option> <option value="2033">2033</option>
-                                            <option value="2034">2034</option> <option value="2035">2035</option>
+                                            <option value="2025">2025</option>
+                                            <option value="2026">2026</option>
+                                            <option value="2027">2027</option>
+                                            <option value="2028">2028</option>
+                                            <option value="2029">2029</option>
+                                            <option value="2030">2030</option>
+                                            <option value="2031">2031</option>
+                                            <option value="2032">2032</option>
+                                            <option value="2033">2033</option>
+                                            <option value="2034">2034</option>
+                                            <option value="2035">2035</option>
                                         </select>
                                     </div>
                                     <div class="form-col cvv-col">
                                         <label for="security_code">CVV</label>
-                                        <input type="text" id="security_code" name="security_code" class="form-control" inputmode="numeric" pattern="[0-9]{3,4}"> </div>
+                                        <input type="text" id="security_code" name="security_code" class="form-control"
+                                            inputmode="numeric" pattern="[0-9]{3,4}">
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -513,7 +595,8 @@
                             <div class="form-group">
                                 <h3>Seller Information</h3>
                                 <label for="seller_business_name">Business Name</label>
-                                <input type="text" id="seller_business_name" name="seller_business_name" class="form-control" required>
+                                <input type="text" id="seller_business_name" name="seller_business_name"
+                                    class="form-control" required>
                             </div>
 
                             <div class="form-group">
@@ -521,24 +604,31 @@
                                 <div class="form-row">
                                     <div class="form-col">
                                         <label for="seller_street_num">Street Number</label>
-                                        <input type="text" id="seller_street_num" name="seller_street_num" class="form-control" required>
+                                        <input type="text" id="seller_street_num" name="seller_street_num"
+                                            class="form-control" required>
                                     </div>
                                     <div class="form-col">
                                         <label for="seller_street_name">Street Name</label>
-                                        <input type="text" id="seller_street_name" name="seller_street_name" class="form-control" required>
+                                        <input type="text" id="seller_street_name" name="seller_street_name"
+                                            class="form-control" required>
                                     </div>
                                 </div>
-                                <div class="form-row" style="margin-top: 15px;"> <div class="form-col">
+                                <div class="form-row" style="margin-top: 15px;">
+                                    <div class="form-col">
                                         <label for="seller_city">City</label>
-                                        <input type="text" id="seller_city" name="seller_city" class="form-control" required>
+                                        <input type="text" id="seller_city" name="seller_city" class="form-control"
+                                            required>
                                     </div>
                                     <div class="form-col">
                                         <label for="seller_state">State</label>
-                                        <input type="text" id="seller_state" name="seller_state" class="form-control" required maxlength="2">
+                                        <input type="text" id="seller_state" name="seller_state" class="form-control"
+                                            required maxlength="2">
                                     </div>
                                     <div class="form-col zip-col">
                                         <label for="seller_zipcode">Zip Code</label>
-                                        <input type="text" id="seller_zipcode" name="seller_zipcode" class="form-control" required inputmode="numeric" pattern="[0-9]{5}(?:-[0-9]{4})?">
+                                        <input type="text" id="seller_zipcode" name="seller_zipcode"
+                                            class="form-control" required inputmode="numeric"
+                                            pattern="[0-9]{5}(?:-[0-9]{4})?">
                                     </div>
                                 </div>
                             </div>
@@ -548,10 +638,13 @@
                                 <div class="form-row">
                                     <div class="form-col">
                                         <label for="bank_routing_number">Bank Routing Number</label>
-                                        <input type="text" id="bank_routing_number" name="bank_routing_number" class="form-control" required inputmode="numeric" pattern="[0-9]{9}"> </div>
+                                        <input type="text" id="bank_routing_number" name="bank_routing_number"
+                                            class="form-control" required inputmode="numeric" pattern="[0-9]{9}">
+                                    </div>
                                     <div class="form-col">
                                         <label for="bank_account_number">Bank Account Number</label>
-                                        <input type="text" id="bank_account_number" name="bank_account_number" class="form-control" required inputmode="numeric">
+                                        <input type="text" id="bank_account_number" name="bank_account_number"
+                                            class="form-control" required inputmode="numeric">
                                     </div>
                                 </div>
                             </div>
@@ -568,12 +661,7 @@
         </div>
     </section>
 
-    <footer>
-        <div class="container">
-            <p>&copy; 2025 - NittanyBusiness Project - CMPSC431W</p>
-            <p>Date: Monday March 24th, 2025</p>
-        </div>
-    </footer>
+
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
@@ -655,25 +743,25 @@
 
             });
 
-             // Real-time password match check (optional but good UX)
-             confirmPasswordInput.addEventListener('input', function() {
-                 if (passwordInput.value !== confirmPasswordInput.value) {
-                     passwordError.style.display = 'block';
-                     confirmPasswordInput.classList.add('is-invalid');
-                 } else {
-                     passwordError.style.display = 'none';
-                     confirmPasswordInput.classList.remove('is-invalid');
-                 }
-             });
-             passwordInput.addEventListener('input', function() {
-                 if (confirmPasswordInput.value && passwordInput.value !== confirmPasswordInput.value) {
-                     passwordError.style.display = 'block';
-                     confirmPasswordInput.classList.add('is-invalid');
-                 } else {
-                     passwordError.style.display = 'none';
-                     confirmPasswordInput.classList.remove('is-invalid');
-                 }
-             });
+            // Real-time password match check (optional but good UX)
+            confirmPasswordInput.addEventListener('input', function () {
+                if (passwordInput.value !== confirmPasswordInput.value) {
+                    passwordError.style.display = 'block';
+                    confirmPasswordInput.classList.add('is-invalid');
+                } else {
+                    passwordError.style.display = 'none';
+                    confirmPasswordInput.classList.remove('is-invalid');
+                }
+            });
+            passwordInput.addEventListener('input', function () {
+                if (confirmPasswordInput.value && passwordInput.value !== confirmPasswordInput.value) {
+                    passwordError.style.display = 'block';
+                    confirmPasswordInput.classList.add('is-invalid');
+                } else {
+                    passwordError.style.display = 'none';
+                    confirmPasswordInput.classList.remove('is-invalid');
+                }
+            });
 
         });
     </script>

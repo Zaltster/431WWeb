@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NittanyBusiness - Dashboard</title>
 </head>
+
 <body>
     <header>
         <h1>NittanyBusiness - Dashboard</h1>
@@ -19,40 +21,39 @@
             <h2>Welcome to Your Dashboard</h2>
             <p>You are logged in as: <strong>{{ user_email }}</strong></p>
             <p>User Type: <strong>{{ user_type }}</strong></p>
-            
+
             <div class="dashboard-content">
                 <h3>Authentication Successful</h3>
                 <p>This confirms that your login credentials were correctly verified against the database.</p>
-                <p>The password you entered was successfully validated against the securely hashed password stored in the database.</p>
-                
+                <p>The password you entered was successfully validated against the securely hashed password stored in
+                    the database.</p>
+
                 {% if user_type == 'helpdesk' %}
-                    <div class="user-specific-content">
-                        <h3>Helpdesk Staff Portal</h3>
-                        <p>Access tools to manage customer requests and provide support.</p>
-                    </div>
+                <div class="user-specific-content">
+                    <h3>Helpdesk Staff Portal</h3>
+                    <p>Access tools to manage customer requests and provide support.</p>
+                </div>
                 {% elif user_type == 'buyer' %}
-                    <div class="user-specific-content">
-                        <h3>Buyer Portal</h3>
-                        <p>Browse products, manage orders, and update your profile.</p>
-                    </div>
+                <div class="user-specific-content">
+                    <h3>Buyer Portal</h3>
+                    <p>Browse products, manage orders, and update your profile.</p>
+                </div>
                 {% elif user_type == 'seller' %}
-                    <div class="user-specific-content">
-                        <h3>Seller Portal</h3>
-                        <p>Manage your product listings, view sales, and update your store information.</p>
-                    </div>
+                <div class="user-specific-content">
+                    <h3>Seller Portal</h3>
+                    <p>Manage your product listings, view sales, and update your store information.</p>
+                </div>
                 {% else %}
-                    <div class="user-specific-content">
-                        <h3>User Portal</h3>
-                        <p>Access your account settings and preferences.</p>
-                    </div>
+                <div class="user-specific-content">
+                    <h3>User Portal</h3>
+                    <p>Access your account settings and preferences.</p>
+                </div>
                 {% endif %}
             </div>
         </section>
     </main>
 
-    <footer>
-        <p>&copy; 2025 - NittanyBusiness Project - CMPSC431W</p>
-        <p>Date: Monday March 24th, 2025</p>
-    </footer>
+
 </body>
+
 </html>
